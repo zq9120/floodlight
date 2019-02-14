@@ -29,6 +29,7 @@ import net.floodlightcontroller.core.util.AppCookie;
 import net.floodlightcontroller.debugcounter.IDebugCounterService;
 import net.floodlightcontroller.devicemanager.IDeviceService;
 import net.floodlightcontroller.devicemanager.SwitchPort;
+import net.floodlightcontroller.dtguard.DTDetection;
 import net.floodlightcontroller.linkdiscovery.ILinkDiscoveryService;
 import net.floodlightcontroller.packet.Ethernet;
 import net.floodlightcontroller.packet.IPacket;
@@ -163,7 +164,7 @@ public abstract class ForwardingBase implements IOFMessageListener {
     public boolean pushRoute(Path route, Match match, OFPacketIn pi,
             DatapathId pinSwitch, U64 cookie, FloodlightContext cntx,
             boolean requestFlowRemovedNotification, OFFlowModCommand flowModCommand, boolean packetOutSent) {
-
+    		DTDetection.flowModCount++;
         List<NodePortTuple> switchPortList = route.getPath();
 
         for (int indx = switchPortList.size() - 1; indx > 0; indx -= 2) {

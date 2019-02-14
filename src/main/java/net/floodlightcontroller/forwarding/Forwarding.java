@@ -38,6 +38,7 @@ import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.devicemanager.IDeviceListener;
 import net.floodlightcontroller.devicemanager.IDeviceService;
 import net.floodlightcontroller.devicemanager.SwitchPort;
+import net.floodlightcontroller.dtguard.DTDetection;
 import net.floodlightcontroller.linkdiscovery.ILinkDiscoveryListener;
 import net.floodlightcontroller.linkdiscovery.ILinkDiscoveryService;
 import net.floodlightcontroller.packet.*;
@@ -1197,6 +1198,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
      * @param cntx The FloodlightContext associated with this OFPacketIn
      */
     protected void doFlood(IOFSwitch sw, OFPacketIn pi, IRoutingDecision decision, FloodlightContext cntx) {
+    		DTDetection.floodCount++;
         OFPort inPort = OFMessageUtils.getInPort(pi);
         OFPacketOut.Builder pob = sw.getOFFactory().buildPacketOut();
         List<OFAction> actions = new ArrayList<>();
