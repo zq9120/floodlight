@@ -238,7 +238,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				String outData = String.format("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n", attackRate, flowTableMatchSuccessRate,
 						interactionCommRate, floodRate, avgCommHostCount, avgFlowPacket);
 
-				if (Integer.valueOf(FileUtils.readFile(CONFIG_PATH)) >= 0) {
+				if (Integer.valueOf(FileUtils.readFile(CONFIG_PATH).trim()) >= 0) {
 					FileUtils.writeFile(CONFIG_PATH, String.valueOf(ATTACK_RATE));
 					FileUtils.writeFile(OUTDATA_PATH, FileUtils.readFile(OUTDATA_PATH) + outData);
 					if (ATTACK_RATE >= 50)
