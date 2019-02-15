@@ -148,20 +148,25 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					byteCount += jsonAggregate.getJSONObject("aggregate").getInt("byte_count");
 				}
 
-				int totalCommCount = commAddrMap.size(); // 总的流数量
-				int interactionCommCount = 0;
-				for (String map : commAddrMap) {
-					String items[] = map.split("-");
-					String key = items[1] + "-" + items[0];
-					if (commAddrMap.contains(key))
-						interactionCommCount++;
+				int totalCommCount, interactionCommCount;
+				synchronized (commAddrMap) {
+					totalCommCount = commAddrMap.size(); // 总的流数量
+					interactionCommCount = 0;
+					for (String map : commAddrMap) {
+						String items[] = map.split("-");
+						String key = items[1] + "-" + items[0];
+						if (commAddrMap.contains(key))
+							interactionCommCount++;
+					}
 				}
 
-				int totalSrcAddrCount = commAddrList.size();
-				int totalDstAddrCount = 0;
-
-				for (String key : commAddrList.keySet()) {
-					totalDstAddrCount += commAddrList.get(key).size();
+				int totalSrcAddrCount, totalDstAddrCount;
+				synchronized (commAddrList) {
+					totalSrcAddrCount = commAddrList.size();
+					totalDstAddrCount = 0;
+					for (String key : commAddrList.keySet()) {
+						totalDstAddrCount += commAddrList.get(key).size();
+					}
 				}
 
 				// 流表匹配成功率 = 1 - PACKET_IN数量 / 数据包的数量 (攻击时减小)
