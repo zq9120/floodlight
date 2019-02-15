@@ -43,10 +43,14 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	protected static int attackCount = 0;
 
 	protected static final String CONTROLLER_URL = "http://127.0.0.1:8080/";
+	protected static final String CONFIG_PATH = "/home/zhangziqi/Documents/scripts/config.txt";
+	protected static final String OUTDATA_PATH = "/home/zhangziqi/Documents/scripts/statistic.csv";
 	protected static final int PERIOD = 10000;
+	protected static int ATTACK_RATE = 0;
 
 	@Override
 	public void init(FloodlightModuleContext context) throws FloodlightModuleException {
+		FileUtils.writeFile(CONFIG_PATH, "0");
 		floodlightProvider = context.getServiceImpl(IFloodlightProviderService.class);
 		logger = LoggerFactory.getLogger(DTDetection.class);
 		commAddrMap = new ArrayList<String>();
@@ -185,7 +189,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				double avgFlowPacket = (float) flowModCount / packetCount;
 
 				// 攻击速率
-				double attackRate = attackCount / (PERIOD / 1000);
+				double attackRate = (float) attackCount / (PERIOD / 1000);
 
 				if (packetCount == 0) {
 					flowTableMatchSuccessRate = 0;
@@ -225,7 +229,10 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				byteCount = 0;
 
 				attackCount = 0;
-
+				ATTACK_RATE++;
+				FileUtils.writeFile(CONFIG_PATH, String.valueOf(ATTACK_RATE));
+				FileUtils.writeFile(OUTDATA_PATH, attackRate + "," + flowTableMatchSuccessRate + ","
+						+ interactionCommRate + "," + floodRate + "," + avgCommHostCount + "," + avgFlowPacket);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
