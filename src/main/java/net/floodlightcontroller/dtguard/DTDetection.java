@@ -35,13 +35,15 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	public static int floodCount = 0; // 执行了flood操作的packetIn数据包数量，用于计算flood触发比例
 	public static int flowModCount = 0; // 下发流规则的数量，用于计算流包数均值
 	protected static Map<String, List<String>> commAddrList; // Map<srcMac, List<dstMac>>，用于计算目的IP地址熵值
-	protected static final String CONTROLLER_URL = "http://127.0.0.1:8080/";
 
 	protected static int flowCount = 0;
 	protected static int packetCount = 0;
 	protected static int byteCount = 0;
 
 	protected static int attackCount = 0;
+
+	protected static final String CONTROLLER_URL = "http://127.0.0.1:8080/";
+	protected static final int PERIOD = 10000;
 
 	@Override
 	public void init(FloodlightModuleContext context) throws FloodlightModuleException {
@@ -50,7 +52,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		commAddrMap = new ArrayList<String>();
 		commAddrList = new HashMap<String, List<String>>();
 		Timer timer = new Timer();
-		timer.schedule(new StaticCalc(), 10000, 10000);
+		timer.schedule(new StaticCalc(), PERIOD, PERIOD);
 	}
 
 	@Override
@@ -89,9 +91,9 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 			String srcMac = eth.getSourceMACAddress().toString();
 			String dstMac = eth.getDestinationMACAddress().toString();
 
-			logger.info("============xxxxxxxxx");
 			String payload = new String(eth.getPayload().serialize());
-			logger.info("============ payload = {}", payload);
+			if (payload.contains("SDN_ATTACK_PAYLOAD"))
+				attackCount++;
 
 			String commAddrKey = srcMac + "-" + dstMac;
 			if (!commAddrMap.contains(commAddrKey))
@@ -177,6 +179,9 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				// 流包数均值 = 下发流规则的数量 / 数据包的数量 (攻击时减小)
 				double avgFlowPacket = (float) flowModCount / packetCount;
 
+				// 攻击速率
+				double attackRate = attackCount / PERIOD * 1000;
+
 				if (packetCount == 0) {
 					flowTableMatchSuccessRate = 0;
 					avgFlowPacket = 0;
@@ -194,11 +199,14 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				logger.info("avgCommHostCount = {} / {}", totalSrcAddrCount, totalDstAddrCount);
 				logger.info("avgFlowPacket = {} / {}", flowModCount, packetCount);
 
+				logger.info("--------------------------------------------------------");
+
 				logger.info("flowTableMatchSuccessRate = {}", String.valueOf(flowTableMatchSuccessRate));
 				logger.info("interactionCommRate = {}", String.valueOf(interactionCommRate));
 				logger.info("floodRate = {}", String.valueOf(floodRate));
 				logger.info("avgCommHostCount = {}", String.valueOf(avgCommHostCount));
 				logger.info("avgFlowPacket = {}", String.valueOf(avgFlowPacket));
+				logger.info("attackRate = {}", String.valueOf(attackRate));
 
 				commAddrMap.clear();
 				packetInCount = 0;
