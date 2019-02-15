@@ -88,9 +88,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 			String srcMac = eth.getSourceMACAddress().toString();
 			String dstMac = eth.getDestinationMACAddress().toString();
-
-			String payload = new String(eth.getPayload().serialize());
 			System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxx");
+			String payload = new String(eth.getPayload().serialize());
 			logger.info("============ payload = {}", payload);
 
 			String commAddrKey = srcMac + "-" + dstMac;
