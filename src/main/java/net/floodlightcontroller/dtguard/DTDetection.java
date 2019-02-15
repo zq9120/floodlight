@@ -218,11 +218,15 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				logger.info("avgFlowPacket = {}", String.valueOf(avgFlowPacket));
 				logger.info("attackRate = {}", String.valueOf(attackRate));
 
-				commAddrMap.clear();
+				synchronized (commAddrMap) {
+					commAddrMap.clear();
+				}
 				packetInCount = 0;
 				floodCount = 0;
 				flowModCount = 0;
-				commAddrList.clear();
+				synchronized (commAddrList) {
+					commAddrList.clear();
+				}
 
 				flowCount = 0;
 				packetCount = 0;
