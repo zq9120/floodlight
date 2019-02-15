@@ -50,7 +50,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 	@Override
 	public void init(FloodlightModuleContext context) throws FloodlightModuleException {
-		FileUtils.writeFile(CONFIG_PATH, "0");
+		FileUtils.writeFile(CONFIG_PATH, "-1");
 		floodlightProvider = context.getServiceImpl(IFloodlightProviderService.class);
 		logger = LoggerFactory.getLogger(DTDetection.class);
 		commAddrMap = new ArrayList<String>();
@@ -234,10 +234,12 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				String outData = String.format("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n", attackRate, flowTableMatchSuccessRate,
 						interactionCommRate, floodRate, avgCommHostCount, avgFlowPacket);
 
-				FileUtils.writeFile(CONFIG_PATH, String.valueOf(ATTACK_RATE));
-				FileUtils.writeFile(OUTDATA_PATH, FileUtils.readFile(OUTDATA_PATH) + outData);
-				if (ATTACK_RATE >= 50)
-					ATTACK_RATE = 0;
+				if (Integer.valueOf(FileUtils.readFile(CONFIG_PATH)) >= 0) {
+					FileUtils.writeFile(CONFIG_PATH, String.valueOf(ATTACK_RATE));
+					FileUtils.writeFile(OUTDATA_PATH, FileUtils.readFile(OUTDATA_PATH) + outData);
+					if (ATTACK_RATE >= 50)
+						ATTACK_RATE = 0;
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
