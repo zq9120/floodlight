@@ -41,6 +41,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	protected static int packetCount = 0;
 	protected static int byteCount = 0;
 
+	protected static int attackCount = 0;
+
 	@Override
 	public void init(FloodlightModuleContext context) throws FloodlightModuleException {
 		floodlightProvider = context.getServiceImpl(IFloodlightProviderService.class);
@@ -86,6 +88,9 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 			String srcMac = eth.getSourceMACAddress().toString();
 			String dstMac = eth.getDestinationMACAddress().toString();
+
+			String payload = new String(eth.getPayload().serialize());
+			logger.info("payload = {}", payload);
 
 			String commAddrKey = srcMac + "-" + dstMac;
 			if (!commAddrMap.contains(commAddrKey))
