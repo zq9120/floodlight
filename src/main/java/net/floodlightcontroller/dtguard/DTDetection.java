@@ -231,8 +231,12 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				attackCount = 0;
 				ATTACK_RATE++;
 				FileUtils.writeFile(CONFIG_PATH, String.valueOf(ATTACK_RATE));
-				FileUtils.writeFile(OUTDATA_PATH, attackRate + "," + flowTableMatchSuccessRate + ","
-						+ interactionCommRate + "," + floodRate + "," + avgCommHostCount + "," + avgFlowPacket);
+				FileUtils.writeFile(OUTDATA_PATH,
+						FileUtils.readFile(OUTDATA_PATH) + attackRate + "," + flowTableMatchSuccessRate + ","
+								+ interactionCommRate + "," + floodRate + "," + avgCommHostCount + "," + avgFlowPacket
+								+ "\n");
+				if (ATTACK_RATE >= 50)
+					ATTACK_RATE = 0;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
