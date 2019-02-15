@@ -156,8 +156,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				synchronized (commAddrMap) {
 					totalCommCount = commAddrMap.size(); // 总的流数量
 					interactionCommCount = 0;
-					for (String map : commAddrMap) {
-						String items[] = map.split("-");
+					for (int i = 0; i < commAddrMap.size(); ++i) {
+						String items[] = commAddrMap.get(i).split("-");
 						String key = items[1] + "-" + items[0];
 						if (commAddrMap.contains(key))
 							interactionCommCount++;
