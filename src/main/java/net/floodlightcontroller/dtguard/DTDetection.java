@@ -92,7 +92,6 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 			String dstMac = eth.getDestinationMACAddress().toString();
 
 			String payload = new String(eth.getPayload().serialize());
-			logger.info("========== payload: {}", payload);
 			if (payload.contains("SDN_ATTACK_PAYLOAD"))
 				attackCount++;
 
