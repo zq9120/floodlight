@@ -186,7 +186,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				double avgFlowPacket = (float) flowModCount / packetCount;
 
 				// 攻击速率
-				double attackRate = attackCount / PERIOD * 1000;
+				double attackRate = attackCount / (PERIOD / 1000);
 
 				if (packetCount == 0) {
 					flowTableMatchSuccessRate = 0;
@@ -204,6 +204,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				logger.info("floodRate = {} / {}", floodCount, packetInCount);
 				logger.info("avgCommHostCount = {} / {}", totalSrcAddrCount, totalDstAddrCount);
 				logger.info("avgFlowPacket = {} / {}", flowModCount, packetCount);
+				logger.info("attackRate = {} / ({} / 1000)", attackCount, PERIOD);
 
 				logger.info("--------------------------------------------------------");
 
