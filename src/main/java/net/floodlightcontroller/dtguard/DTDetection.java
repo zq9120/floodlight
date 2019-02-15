@@ -205,7 +205,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				logger.info("flowTableMatchSuccessRate = 1 - ({} / {})", packetInCount, packetCount);
 				logger.info("interactionCommRate = {} / {}", interactionCommCount, totalCommCount);
 				logger.info("floodRate = {} / {}", floodCount, packetInCount);
-				logger.info("avgCommHostCount = {} / {}", totalSrcAddrCount, totalDstAddrCount);
+				logger.info("avgCommHostCount = {} / {}", totalDstAddrCount, totalSrcAddrCount);
 				logger.info("avgFlowPacket = {} / {}", flowModCount, packetCount);
 				logger.info("attackRate = {} / ({} / 1000)", attackCount, PERIOD);
 
