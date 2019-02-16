@@ -223,6 +223,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
                 case MULTICAST:
                     // treat as broadcast
                     doFlood(sw, pi, decision, cntx);
+                    DTDetection.floodCount++;
                     return Command.CONTINUE;
 
                 case DROP:
@@ -1198,7 +1199,6 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
      * @param cntx The FloodlightContext associated with this OFPacketIn
      */
     protected void doFlood(IOFSwitch sw, OFPacketIn pi, IRoutingDecision decision, FloodlightContext cntx) {
-    		DTDetection.floodCount++;
         OFPort inPort = OFMessageUtils.getInPort(pi);
         OFPacketOut.Builder pob = sw.getOFFactory().buildPacketOut();
         List<OFAction> actions = new ArrayList<>();

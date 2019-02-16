@@ -188,7 +188,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				double interactionCommRate = (float) interactionCommCount / totalCommCount;
 
 				// FLOOD触发比例 = 触发FLOOD操作的PACKET_IN数量 / PACKET_IN数量 (攻击时增大)
-				double floodRate = (float) floodCount / packetCount;
+				double floodRate = (float) floodCount / packetInCount;
 
 				// 平均通信主机数 = 目的IP地址数 / 源IP地址数 (攻击时增大)
 				double avgCommHostCount = (float) totalDstAddrCount / totalSrcAddrCount;
