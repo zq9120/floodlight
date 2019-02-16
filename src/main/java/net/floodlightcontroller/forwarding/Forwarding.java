@@ -659,6 +659,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
         if (!topologyService.isEdge(srcSw, srcPort)) {
             log.debug("Packet destination is known, but packet was not received on an edge port (rx on {}/{}). Flooding packet", srcSw, srcPort);
             doFlood(sw, pi, decision, cntx);
+            DTDetection.floodCount++;
             return;
         }
 
