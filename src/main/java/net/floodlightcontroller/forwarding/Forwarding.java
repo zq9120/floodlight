@@ -200,6 +200,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 
     @Override
     public Command processPacketInMessage(IOFSwitch sw, OFPacketIn pi, IRoutingDecision decision, FloodlightContext cntx) {
+    		DTDetection.forwardPacketInCount++;
         Ethernet eth = IFloodlightProviderService.bcStore.get(cntx, IFloodlightProviderService.CONTEXT_PI_PAYLOAD);
 
         OFPort inPort = OFMessageUtils.getInPort(pi);
@@ -620,6 +621,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
     protected void doL2Forwarding(Ethernet eth, IOFSwitch sw, OFPacketIn pi, IRoutingDecision decision, FloodlightContext cntx) {
         if (isBroadcastOrMulticast(eth)) {
         		System.out.println("====== 7 ======");
+        		DTDetection.floodCount++;
             doFlood(sw, pi, decision, cntx);
         } else {
             doL2ForwardFlow(sw, pi, decision, cntx, false);
@@ -645,7 +647,6 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
             log.debug("Destination device unknown. Flooding packet");
             System.out.println("====== 8 ======");
             doFlood(sw, pi, decision, cntx);
-            DTDetection.floodCount++;
             return;
         }
 

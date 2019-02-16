@@ -36,6 +36,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	protected static int packetInCount = 0; // 收到packetIn数据包的数量，用于计算flood触发比例
 	public static int floodCount = 0; // 执行了flood操作的packetIn数据包数量，用于计算flood触发比例
 	public static int flowModCount = 0; // 下发流规则的数量，用于计算流包数均值
+	public static int forwardPacketInCount = 0;
 	protected static Map<String, List<String>> commAddrList; // Map<srcMac, List<dstMac>>，用于计算目的IP地址熵值
 
 	protected static int flowCount = 0;
@@ -182,13 +183,13 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				}
 
 				// 流表匹配成功率 = 1 - PACKET_IN数量 / 数据包的数量 (攻击时减小)
-				double flowTableMatchSuccessRate = 1 - ((float) packetInCount / packetCount);
+				double flowTableMatchSuccessRate = 1 - ((float) forwardPacketInCount / packetCount);
 
 				// 对流比 = 有交互的流数量 / 总的流数量 (攻击时减小)
 				double interactionCommRate = (float) interactionCommCount / totalCommCount;
 
 				// FLOOD触发比例 = 触发FLOOD操作的PACKET_IN数量 / PACKET_IN数量 (攻击时增大)
-				double floodRate = (float) floodCount / packetInCount;
+				double floodRate = (float) floodCount / forwardPacketInCount;
 
 				// 平均通信主机数 = 目的IP地址数 / 源IP地址数 (攻击时增大)
 				double avgCommHostCount = (float) totalDstAddrCount / totalSrcAddrCount;
@@ -201,22 +202,22 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 				if (packetCount == 0)
 					flowTableMatchSuccessRate = 0;
-				
+
 				if (totalCommCount == 0)
 					interactionCommRate = 0;
-				
+
 				if (packetInCount == 0)
 					floodRate = 0;
-				
+
 				if (totalSrcAddrCount == 0)
 					avgCommHostCount = 0;
-				
+
 				if (packetInCount == 0)
 					avgFlowPacket = 0;
 
-				logger.info("flowTableMatchSuccessRate = 1 - ({} / {})", packetInCount, packetCount);
+				logger.info("flowTableMatchSuccessRate = 1 - ({} / {})", forwardPacketInCount, packetCount);
 				logger.info("interactionCommRate = {} / {}", interactionCommCount, totalCommCount);
-				logger.info("floodRate = {} / {}", floodCount, packetInCount);
+				logger.info("floodRate = {} / {}", floodCount, forwardPacketInCount);
 				logger.info("avgCommHostCount = {} / {}", totalDstAddrCount, totalSrcAddrCount);
 				logger.info("avgFlowPacket = {} / {}", flowModCount, packetInCount);
 				logger.info("attackRate = {} / ({} / 1000)", attackCount, PERIOD);
@@ -236,6 +237,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				packetInCount = 0;
 				floodCount = 0;
 				flowModCount = 0;
+				forwardPacketInCount++;
 				synchronized (commAddrList) {
 					commAddrList.clear();
 				}
