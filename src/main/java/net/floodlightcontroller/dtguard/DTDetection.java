@@ -194,7 +194,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				double avgCommHostCount = (float) totalDstAddrCount / totalSrcAddrCount;
 
 				// 流包数均值 = 下发流规则的数量 / 数据包的数量 (攻击时减小)
-				double avgFlowPacket = (float) flowModCount / packetCount;
+				double avgFlowPacket = (float) flowModCount / packetInCount;
 
 				// 攻击速率
 				double attackRate = (float) attackCount / (PERIOD / 1000);
@@ -214,7 +214,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				logger.info("interactionCommRate = {} / {}", interactionCommCount, totalCommCount);
 				logger.info("floodRate = {} / {}", floodCount, packetInCount);
 				logger.info("avgCommHostCount = {} / {}", totalDstAddrCount, totalSrcAddrCount);
-				logger.info("avgFlowPacket = {} / {}", flowModCount, packetCount);
+				logger.info("avgFlowPacket = {} / {}", flowModCount, packetInCount);
 				logger.info("attackRate = {} / ({} / 1000)", attackCount, PERIOD);
 
 				logger.info("--------------------------------------------------------");

@@ -385,7 +385,6 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
                 else {
                     log.debug("Destination device unknown. Flooding packet");
                     doFlood(sw, pi, decision, cntx);
-                    DTDetection.floodCount++;
                 }
 
                 return;
@@ -1199,11 +1198,12 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
      * @param cntx The FloodlightContext associated with this OFPacketIn
      */
     protected void doFlood(IOFSwitch sw, OFPacketIn pi, IRoutingDecision decision, FloodlightContext cntx) {
+    		DTDetection.floodCount++;
         OFPort inPort = OFMessageUtils.getInPort(pi);
         OFPacketOut.Builder pob = sw.getOFFactory().buildPacketOut();
         List<OFAction> actions = new ArrayList<>();
         Set<OFPort> broadcastPorts = this.topologyService.getSwitchBroadcastPorts(sw.getId());
-
+        
         if (broadcastPorts.isEmpty()) {
             log.debug("No broadcast ports found. Using FLOOD output action");
             broadcastPorts = Collections.singleton(OFPort.FLOOD);
