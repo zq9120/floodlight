@@ -157,10 +157,12 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					totalCommCount = commAddrMap.size(); // 总的流数量
 					interactionCommCount = 0;
 					for (int i = 0; i < commAddrMap.size(); ++i) {
-						String items[] = commAddrMap.get(i).split("-");
-						String key = items[1] + "-" + items[0];
-						if (commAddrMap.contains(key))
-							interactionCommCount++;
+						if (commAddrMap.get(i).contains("-")) {
+							String items[] = commAddrMap.get(i).split("-");
+							String key = items[1] + "-" + items[0];
+							if (commAddrMap.contains(key))
+								interactionCommCount++;
+						}
 					}
 				}
 
