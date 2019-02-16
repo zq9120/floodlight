@@ -51,6 +51,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	@Override
 	public void init(FloodlightModuleContext context) throws FloodlightModuleException {
 		FileUtils.writeFile(CONFIG_PATH, "-1");
+		FileUtils.writeFile(OUTDATA_PATH, "");
 		floodlightProvider = context.getServiceImpl(IFloodlightProviderService.class);
 		logger = LoggerFactory.getLogger(DTDetection.class);
 		commAddrMap = new ArrayList<String>();
