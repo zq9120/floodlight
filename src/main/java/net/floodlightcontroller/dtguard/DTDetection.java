@@ -199,16 +199,20 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				// 攻击速率
 				double attackRate = (float) attackCount / (PERIOD / 1000);
 
-				if (packetCount == 0) {
+				if (packetCount == 0)
 					flowTableMatchSuccessRate = 0;
-					avgFlowPacket = 0;
-				}
+				
 				if (totalCommCount == 0)
 					interactionCommRate = 0;
+				
 				if (packetInCount == 0)
 					floodRate = 0;
+				
 				if (totalSrcAddrCount == 0)
 					avgCommHostCount = 0;
+				
+				if (packetInCount == 0)
+					flowModCount = 0;
 
 				logger.info("flowTableMatchSuccessRate = 1 - ({} / {})", packetInCount, packetCount);
 				logger.info("interactionCommRate = {} / {}", interactionCommCount, totalCommCount);
