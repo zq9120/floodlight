@@ -222,6 +222,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 
                 case MULTICAST:
                     // treat as broadcast
+                		System.out.println("====== 1 ======");
                     doFlood(sw, pi, decision, cntx);
                     return Command.CONTINUE;
 
@@ -333,6 +334,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
                 log.debug("Virtual gateway pushing ARP reply message to source host");
             }
             else {
+            		System.out.println("====== 2 ======");
                 doFlood(sw, pi, decision, cntx);
             }
         }
@@ -384,6 +386,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
                 // Normal L2 traffic
                 else {
                     log.debug("Destination device unknown. Flooding packet");
+                    System.out.println("====== 3 ======");
                     doFlood(sw, pi, decision, cntx);
                 }
 
@@ -401,6 +404,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
                 IFloodlightProviderService.bcStore.get(cntx, IFloodlightProviderService.CONTEXT_PI_PAYLOAD).getEtherType()
                         == EthType.ARP) {
             log.debug("ARP flows disabled in Forwarding. Flooding ARP packet");
+            System.out.println("====== 4 ======");
             doFlood(sw, pi, decision, cntx);
             return;
         }
@@ -408,7 +412,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
         /* This packet-in is from a switch in the path before its flow was installed along the path */
         if (!topologyService.isEdge(srcSw, srcPort) && !eth.getDestinationMACAddress().equals(virtualGatewayMac)) {
             log.debug("Packet destination is known, but packet was not received on an edge port (rx on {}/{}). Flooding packet", srcSw, srcPort);
-            DTDetection.floodCount++;
+            System.out.println("====== 5 ======");
             doFlood(sw, pi, decision, cntx);
             return;
         }
@@ -445,6 +449,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
             }
             else { // Try L2 Flood again
                 log.debug("Could not locate edge attachment point for destination device {}. Flooding packet");
+                System.out.println("====== 6 ======");
                 doFlood(sw, pi, decision, cntx);
             }
             return;
@@ -614,6 +619,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
      */
     protected void doL2Forwarding(Ethernet eth, IOFSwitch sw, OFPacketIn pi, IRoutingDecision decision, FloodlightContext cntx) {
         if (isBroadcastOrMulticast(eth)) {
+        		System.out.println("====== 7 ======");
             doFlood(sw, pi, decision, cntx);
         } else {
             doL2ForwardFlow(sw, pi, decision, cntx, false);
@@ -637,7 +643,9 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 
         if (dstDevice == null) {
             log.debug("Destination device unknown. Flooding packet");
+            System.out.println("====== 8 ======");
             doFlood(sw, pi, decision, cntx);
+            DTDetection.floodCount++;
             return;
         }
 
@@ -651,6 +659,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
                 IFloodlightProviderService.bcStore.get(cntx, IFloodlightProviderService.CONTEXT_PI_PAYLOAD).getEtherType()
                         == EthType.ARP) {
             log.debug("ARP flows disabled in Forwarding. Flooding ARP packet");
+            System.out.println("====== 9 ======");
             doFlood(sw, pi, decision, cntx);
             return;
         }
@@ -658,8 +667,8 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
         /* This packet-in is from a switch in the path before its flow was installed along the path */
         if (!topologyService.isEdge(srcSw, srcPort)) {
             log.debug("Packet destination is known, but packet was not received on an edge port (rx on {}/{}). Flooding packet", srcSw, srcPort);
+            System.out.println("====== 10 ======");
             doFlood(sw, pi, decision, cntx);
-            DTDetection.floodCount++;
             return;
         }
 
@@ -690,6 +699,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
          */
         if (dstAp == null) {
             log.debug("Could not locate edge attachment point for destination device {}. Flooding packet");
+            System.out.println("====== 11 ======");
             doFlood(sw, pi, decision, cntx);
             return;
         }
