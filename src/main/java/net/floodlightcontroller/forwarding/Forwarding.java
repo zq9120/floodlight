@@ -223,7 +223,6 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
                 case MULTICAST:
                     // treat as broadcast
                     doFlood(sw, pi, decision, cntx);
-                    DTDetection.floodCount++;
                     return Command.CONTINUE;
 
                 case DROP:
@@ -386,6 +385,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
                 else {
                     log.debug("Destination device unknown. Flooding packet");
                     doFlood(sw, pi, decision, cntx);
+                    DTDetection.floodCount++;
                 }
 
                 return;
