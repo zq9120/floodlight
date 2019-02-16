@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.projectfloodlight.openflow.protocol.OFMessage;
 import org.projectfloodlight.openflow.protocol.OFType;
+import org.projectfloodlight.openflow.types.EthType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ import net.floodlightcontroller.core.module.FloodlightModuleException;
 import net.floodlightcontroller.core.module.IFloodlightModule;
 import net.floodlightcontroller.core.module.IFloodlightService;
 import net.floodlightcontroller.packet.Ethernet;
+import net.floodlightcontroller.packet.IPv4;
 
 public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
@@ -92,27 +94,30 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		switch (msg.getType()) {
 		case PACKET_IN:
 			Ethernet eth = IFloodlightProviderService.bcStore.get(cntx, IFloodlightProviderService.CONTEXT_PI_PAYLOAD);
+			if (eth.getEtherType() != EthType.IPv4)
+				break;
 
-			String srcMac = eth.getSourceMACAddress().toString();
-			String dstMac = eth.getDestinationMACAddress().toString();
+			IPv4 ipv4 = (IPv4) eth.getPayload();
+			String srcIP = ipv4.getSourceAddress().toString();
+			String dstIP = ipv4.getDestinationAddress().toString();
 
 			String payload = new String(eth.getPayload().serialize());
 			if (payload.contains("SDN_ATTACK_PAYLOAD"))
 				attackCount++;
 
-			String commAddrKey = srcMac + "-" + dstMac;
+			String commAddrKey = srcIP + "-" + dstIP;
 			if (!commAddrMap.contains(commAddrKey))
 				commAddrMap.add(commAddrKey);
 
 			List<String> dstList;
-			if (commAddrList.containsKey(srcMac)) {
-				dstList = commAddrList.get(srcMac);
+			if (commAddrList.containsKey(srcIP)) {
+				dstList = commAddrList.get(srcIP);
 			} else {
 				dstList = new ArrayList<String>();
-				commAddrList.put(srcMac, dstList);
+				commAddrList.put(srcIP, dstList);
 			}
-			if (!dstList.contains(dstMac))
-				dstList.add(dstMac);
+			if (!dstList.contains(dstIP))
+				dstList.add(dstIP);
 
 			packetInCount++;
 
