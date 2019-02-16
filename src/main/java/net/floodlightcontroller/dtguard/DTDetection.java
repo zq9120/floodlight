@@ -212,7 +212,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					avgCommHostCount = 0;
 				
 				if (packetInCount == 0)
-					flowModCount = 0;
+					avgFlowPacket = 0;
 
 				logger.info("flowTableMatchSuccessRate = 1 - ({} / {})", packetInCount, packetCount);
 				logger.info("interactionCommRate = {} / {}", interactionCommCount, totalCommCount);
