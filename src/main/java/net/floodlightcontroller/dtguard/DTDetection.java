@@ -121,7 +121,6 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				dstList.add(dstIP);
 
 			packetInCount++;
-
 			break;
 		default:
 			break;
@@ -183,7 +182,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				}
 
 				// 流表匹配成功率 = 1 - PACKET_IN数量 / 数据包的数量 (攻击时减小)
-				double flowTableMatchSuccessRate = 1 - ((float) packetInCount / packetCount);
+				double flowTableMatchSuccessRate = 1 - ((float) packetInCount * 100 / packetCount);
 
 				// 对流比 = 有交互的流数量 / 总的流数量 (攻击时减小)
 				double interactionCommRate = (float) interactionCommCount / totalCommCount;
@@ -194,8 +193,11 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				// 平均通信主机数 = 目的IP地址数 / 源IP地址数 (攻击时增大)
 				double avgCommHostCount = (float) totalDstAddrCount / totalSrcAddrCount;
 
+				// FLOW_MOD比例 = 下发流规则的数量 / PACKET_IN数量 (攻击时减小)
+				double flowModRate = (float) flowModCount / packetInCount;
+
 				// 流包数均值 = 下发流规则的数量 / 数据包的数量 (攻击时减小)
-				double avgFlowPacket = (float) flowModCount / packetInCount;
+				double avgFlowPacket = (float) packetCount / flowCount;
 
 				// 攻击速率
 				double attackRate = (float) attackCount / (PERIOD / 1000);
@@ -215,12 +217,13 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				if (packetInCount == 0)
 					avgFlowPacket = 0;
 
+				logger.info("attackRate = {} / ({} / 1000)", attackCount, PERIOD);
 				logger.info("flowTableMatchSuccessRate = 1 - ({} / {})", packetInCount, packetCount);
 				logger.info("interactionCommRate = {} / {}", interactionCommCount, totalCommCount);
 				logger.info("floodRate = {} / {}", floodCount, forwardPacketInCount);
 				logger.info("avgCommHostCount = {} / {}", totalDstAddrCount, totalSrcAddrCount);
-				logger.info("avgFlowPacket = {} / {}", flowModCount, packetInCount);
-				logger.info("attackRate = {} / ({} / 1000)", attackCount, PERIOD);
+				logger.info("flowModRate = {} / {}", flowModCount, packetInCount);
+				logger.info("avgFlowPacket = {} / {}", packetCount, flowCount);
 
 				logger.info("--------------------------------------------------------");
 
@@ -228,6 +231,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				logger.info("interactionCommRate = {}", String.valueOf(interactionCommRate));
 				logger.info("floodRate = {}", String.valueOf(floodRate));
 				logger.info("avgCommHostCount = {}", String.valueOf(avgCommHostCount));
+				logger.info("flowModRate = {}", String.valueOf(flowModRate));
 				logger.info("avgFlowPacket = {}", String.valueOf(avgFlowPacket));
 				logger.info("attackRate = {}", String.valueOf(attackRate));
 
@@ -250,8 +254,9 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 				if (Integer.valueOf(FileUtils.readFile(CONFIG_PATH).trim()) >= 0) {
 					ATTACK_RATE++;
-					String outData = String.format("%.2f,%.2f,%.2f,%.4f,%.2f,%.2f\n", attackRate,
-							flowTableMatchSuccessRate, interactionCommRate, floodRate, avgCommHostCount, avgFlowPacket);
+					String outData = String.format("%.2f,%.2f,%.2f,%.4f,%.2f,%.2f,%.2f\n", attackRate,
+							flowTableMatchSuccessRate, interactionCommRate, floodRate, avgCommHostCount, flowModRate,
+							avgFlowPacket);
 
 					FileUtils.writeFile(CONFIG_PATH, String.valueOf(ATTACK_RATE));
 					FileUtils.writeFile(OUTDATA_PATH, FileUtils.readFile(OUTDATA_PATH) + outData);
