@@ -302,6 +302,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					String ip = dstList.get(i);
 					int count = 0;
 					for (int j = 0; j < dstListFull.size(); ++j) {
+						System.out.println(ip);
+						System.out.println(dstListFull.get(j));
 						if (ip.equals(dstListFull.get(j)))
 							count++;
 					}
