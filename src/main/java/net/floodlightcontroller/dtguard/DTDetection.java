@@ -291,30 +291,35 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		}
 
 		private double entropy() {
-			double H_sum = 0, size = commAddrListFull.size();
-			for (String key : commAddrListFull.keySet()) {
-				List<String> dstListFull = commAddrListFull.get(key);
-				Set<String> middleHashSet = new HashSet<String>(dstListFull);
-				List<String> dstList = new ArrayList<String>(middleHashSet);
+			try {
+				double H_sum = 0, size = commAddrListFull.size();
+				for (String key : commAddrListFull.keySet()) {
+					List<String> dstListFull = commAddrListFull.get(key);
+					Set<String> middleHashSet = new HashSet<String>(dstListFull);
+					List<String> dstList = new ArrayList<String>(middleHashSet);
 
-				double H = 0;
-				for (int i = 0; i < dstList.size(); ++i) {
-					String ip = dstList.get(i);
-					int count = 0;
-					for (int j = 0; j < dstListFull.size(); ++j) {
-						System.out.println(ip);
-						System.out.println(dstListFull.get(j));
-						System.out.println("-----");
-						if (ip.equals(dstListFull.get(j)))
-							count++;
+					double H = 0;
+					for (int i = 0; i < dstList.size(); ++i) {
+						String ip = dstList.get(i);
+						int count = 0;
+						for (int j = 0; j < dstListFull.size(); ++j) {
+							System.out.println(ip);
+							System.out.println(dstListFull.get(j));
+							System.out.println("-----");
+							if (ip.equals(dstListFull.get(j)))
+								count++;
+						}
+						double p = (float) count / dstListFull.size();
+						if (p > 0)
+							H += -(p * Math.log(p) / Math.log(2));
 					}
-					double p = (float) count / dstListFull.size();
-					if (p > 0)
-						H += -(p * Math.log(p) / Math.log(2));
+					H_sum += H;
 				}
-				H_sum += H;
+				return size == 0 ? 0 : H_sum / size;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return 0;
 			}
-			return size == 0 ? 0 : H_sum / size;
 		}
 
 	}
