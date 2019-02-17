@@ -302,7 +302,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					String ip = dstList.get(i);
 					int count = 0;
 					for (int j = 0; j < dstListFull.size(); ++j) {
-						if (dstListFull.get(j).equals(ip))
+						if (ip.equals(dstListFull.get(j)))
 							count++;
 					}
 					double p = (float) count / dstListFull.size();
@@ -311,7 +311,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				}
 				H_sum += H;
 			}
-			return size == 0 ? 0 : (float) H_sum / size;
+			return size == 0 ? 0 : H_sum / size;
 		}
 
 	}
