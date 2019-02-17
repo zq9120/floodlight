@@ -230,6 +230,9 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					avgCommHostCount = 0;
 
 				if (packetInCount == 0)
+					flowModRate = 0;
+
+				if (packetInCount == 0)
 					avgFlowPacket = 0;
 
 				logger.info("attackRate = {} / ({} / 1000)", attackCount, PERIOD);
@@ -242,6 +245,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 				logger.info("--------------------------------------------------------");
 
+				logger.info("attackRate = {}", String.valueOf(attackRate));
 				logger.info("flowTableMatchSuccessRate = {}", String.valueOf(flowTableMatchSuccessRate));
 				logger.info("interactionCommRate = {}", String.valueOf(interactionCommRate));
 				logger.info("floodRate = {}", String.valueOf(floodRate));
@@ -249,7 +253,6 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				logger.info("entropy = {}", String.valueOf(entropy));
 				logger.info("flowModRate = {}", String.valueOf(flowModRate));
 				logger.info("avgFlowPacket = {}", String.valueOf(avgFlowPacket));
-				logger.info("attackRate = {}", String.valueOf(attackRate));
 
 				synchronized (commAddrMap) {
 					commAddrMap.clear();
@@ -289,7 +292,6 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 		private double entropy() {
 			double H_sum = 0, size = commAddrListFull.size();
-
 			for (String key : commAddrList.keySet()) {
 				List<String> dstListFull = commAddrListFull.get(key);
 				Set<String> middleHashSet = new HashSet<String>(dstListFull);
