@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,6 +40,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	public static int flowModCount = 0; // 下发流规则的数量，用于计算流包数均值
 	public static int forwardPacketInCount = 0;
 	protected static Map<String, List<String>> commAddrList; // Map<srcMac, List<dstMac>>，用于计算目的IP地址熵值
+	protected static Map<String, List<String>> commAddrListFull;
 
 	protected static int flowCount = 0;
 	protected static int packetCount = 0;
@@ -59,6 +62,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		logger = LoggerFactory.getLogger(DTDetection.class);
 		commAddrMap = new ArrayList<String>();
 		commAddrList = new HashMap<String, List<String>>();
+		commAddrListFull = new HashMap<String, List<String>>();
 		Timer timer = new Timer();
 		timer.schedule(new StaticCalc(), PERIOD, PERIOD);
 	}
@@ -119,6 +123,15 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 			}
 			if (!dstList.contains(dstIP))
 				dstList.add(dstIP);
+
+			List<String> dstListFull;
+			if (commAddrListFull.containsKey(srcIP)) {
+				dstListFull = commAddrListFull.get(srcIP);
+			} else {
+				dstListFull = new ArrayList<String>();
+				commAddrListFull.put(srcIP, dstListFull);
+			}
+			dstListFull.add(dstIP);
 
 			packetInCount++;
 			break;
@@ -193,6 +206,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				// 平均通信主机数 = 目的IP地址数 / 源IP地址数 (攻击时增大)
 				double avgCommHostCount = (float) totalDstAddrCount / totalSrcAddrCount;
 
+				double entropy = entropy();
+
 				// FLOW_MOD比例 = 下发流规则的数量 / PACKET_IN数量 (攻击时减小)
 				double flowModRate = (float) flowModCount / packetInCount;
 
@@ -231,6 +246,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				logger.info("interactionCommRate = {}", String.valueOf(interactionCommRate));
 				logger.info("floodRate = {}", String.valueOf(floodRate));
 				logger.info("avgCommHostCount = {}", String.valueOf(avgCommHostCount));
+				logger.info("entropy = {}", String.valueOf(entropy));
 				logger.info("flowModRate = {}", String.valueOf(flowModRate));
 				logger.info("avgFlowPacket = {}", String.valueOf(avgFlowPacket));
 				logger.info("attackRate = {}", String.valueOf(attackRate));
@@ -245,6 +261,9 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				synchronized (commAddrList) {
 					commAddrList.clear();
 				}
+				synchronized (commAddrListFull) {
+					commAddrListFull.clear();
+				}
 
 				flowCount = 0;
 				packetCount = 0;
@@ -254,9 +273,9 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 				if (Integer.valueOf(FileUtils.readFile(CONFIG_PATH).trim()) >= 0) {
 					ATTACK_RATE++;
-					String outData = String.format("%.2f,%.2f,%.2f,%.4f,%.2f,%.2f,%.2f\n", attackRate,
-							flowTableMatchSuccessRate, interactionCommRate, floodRate, avgCommHostCount, flowModRate,
-							avgFlowPacket);
+					String outData = String.format("%.2f,%.2f,%.2f,%.4f,%.2f,%.2f,%.2f,%.2f\n", attackRate,
+							flowTableMatchSuccessRate, interactionCommRate, floodRate, avgCommHostCount, entropy,
+							flowModRate, avgFlowPacket);
 
 					FileUtils.writeFile(CONFIG_PATH, String.valueOf(ATTACK_RATE));
 					FileUtils.writeFile(OUTDATA_PATH, FileUtils.readFile(OUTDATA_PATH) + outData);
@@ -267,6 +286,32 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				e.printStackTrace();
 			}
 		}
+
+		private double entropy() {
+			double H_sum = 0, size = commAddrListFull.size();
+
+			for (String key : commAddrList.keySet()) {
+				List<String> dstListFull = commAddrListFull.get(key);
+				Set<String> middleHashSet = new HashSet<String>(dstListFull);
+				List<String> dstList = new ArrayList<String>(middleHashSet);
+
+				double H = 0;
+				for (int i = 0; i < dstList.size(); ++i) {
+					String ip = dstList.get(i);
+					int count = 0;
+					for (int j = 0; j < dstListFull.size(); ++j) {
+						if (dstListFull.get(j).equals(ip))
+							count++;
+					}
+					double p = (float) count / dstListFull.size();
+					if (p > 0)
+						H += -(p * Math.log(p) / Math.log(2));
+				}
+				H_sum += H;
+			}
+			return H_sum / size;
+		}
+
 	}
 
 }
