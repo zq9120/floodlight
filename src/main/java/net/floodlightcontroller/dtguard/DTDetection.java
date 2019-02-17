@@ -292,7 +292,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 		private double entropy() {
 			double H_sum = 0, size = commAddrListFull.size();
-			for (String key : commAddrList.keySet()) {
+			for (String key : commAddrListFull.keySet()) {
 				List<String> dstListFull = commAddrListFull.get(key);
 				Set<String> middleHashSet = new HashSet<String>(dstListFull);
 				List<String> dstList = new ArrayList<String>(middleHashSet);
