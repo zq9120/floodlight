@@ -59,7 +59,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	@Override
 	public void init(FloodlightModuleContext context) throws FloodlightModuleException {
 		FileUtils.writeFile(CONFIG_PATH, "-1");
-		FileUtils.writeFile(OUTDATA_PATH, "");
+		FileUtils.writeFile(OUTDATA_PATH, "攻击速率,流表匹配成功率,对流比,FLOOD触发比例,平均通信主机数,目的IP地址熵值,FLOW_MOD比例,流包数均值\n");
 		floodlightProvider = context.getServiceImpl(IFloodlightProviderService.class);
 		logger = LoggerFactory.getLogger(DTDetection.class);
 		commAddrMap = new ArrayList<String>();
@@ -283,12 +283,14 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 					FileUtils.writeFile(CONFIG_PATH, String.valueOf(ATTACK_RATE));
 					FileUtils.writeFile(OUTDATA_PATH, FileUtils.readFile(OUTDATA_PATH) + outData);
-					if (repeatCount++ == REPEAT_COUNT_LIMIT) {
-						repeatCount = 0;
-						ATTACK_RATE++;
-						if (ATTACK_RATE >= 50)
-							System.exit(0);
-					}
+					if (repeatCount++ == 300)
+						System.exit(0);
+					// if (repeatCount++ == REPEAT_COUNT_LIMIT) {
+					// repeatCount = 0;
+					// ATTACK_RATE++;
+					// if (ATTACK_RATE >= 50)
+					// System.exit(0);
+					// }
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
