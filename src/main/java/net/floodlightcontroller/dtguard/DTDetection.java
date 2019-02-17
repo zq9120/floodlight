@@ -53,6 +53,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	protected static final String OUTDATA_PATH = "/home/zhangziqi/Documents/scripts/statistic.csv";
 	protected static final int PERIOD = 10000;
 	protected static int ATTACK_RATE = 0;
+	protected static int REPEAT_COUNT_LIMIT = 5;
+	protected static int repeatCount = 0;
 
 	@Override
 	public void init(FloodlightModuleContext context) throws FloodlightModuleException {
@@ -194,6 +196,9 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					}
 				}
 
+				// 攻击速率
+				double attackRate = (float) attackCount / (PERIOD / 1000);
+
 				// 流表匹配成功率 = 1 - PACKET_IN数量 / 数据包的数量 (攻击时减小)
 				double flowTableMatchSuccessRate = 1 - ((float) packetInCount * 100 / packetCount);
 
@@ -211,11 +216,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				// FLOW_MOD比例 = 下发流规则的数量 / PACKET_IN数量 (攻击时减小)
 				double flowModRate = (float) flowModCount / packetInCount;
 
-				// 流包数均值 = 下发流规则的数量 / 数据包的数量 (攻击时减小)
+				// 流包数均值 = 下发流规则的数量 / 数据包的数量 (攻击时增大)
 				double avgFlowPacket = (float) packetCount / flowCount;
-
-				// 攻击速率
-				double attackRate = (float) attackCount / (PERIOD / 1000);
 
 				if (packetCount == 0)
 					flowTableMatchSuccessRate = 0;
@@ -275,15 +277,18 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				attackCount = 0;
 
 				if (Integer.valueOf(FileUtils.readFile(CONFIG_PATH).trim()) >= 0) {
-					ATTACK_RATE++;
 					String outData = String.format("%.2f,%.2f,%.2f,%.4f,%.2f,%.2f,%.2f,%.2f\n", attackRate,
 							flowTableMatchSuccessRate, interactionCommRate, floodRate, avgCommHostCount, entropy,
 							flowModRate, avgFlowPacket);
 
 					FileUtils.writeFile(CONFIG_PATH, String.valueOf(ATTACK_RATE));
 					FileUtils.writeFile(OUTDATA_PATH, FileUtils.readFile(OUTDATA_PATH) + outData);
-					if (ATTACK_RATE >= 50)
-						ATTACK_RATE = 0;
+					if (repeatCount++ == REPEAT_COUNT_LIMIT) {
+						repeatCount = 0;
+						ATTACK_RATE++;
+						if (ATTACK_RATE >= 50)
+							System.exit(0);
+					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -318,7 +323,6 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				return 0;
 			}
 		}
-
 	}
 
 }
