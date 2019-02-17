@@ -311,7 +311,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				}
 				H_sum += H;
 			}
-			return size == 0 ? 0 : H_sum / size;
+			return size == 0 ? 0 : (float) H_sum / size;
 		}
 
 	}
