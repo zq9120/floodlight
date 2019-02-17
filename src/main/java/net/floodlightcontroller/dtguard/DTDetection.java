@@ -183,7 +183,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				}
 
 				// 流表匹配成功率 = 1 - PACKET_IN数量 / 数据包的数量 (攻击时减小)
-				double flowTableMatchSuccessRate = 1 - ((float) forwardPacketInCount / packetCount);
+				double flowTableMatchSuccessRate = 1 - ((float) packetInCount / packetCount);
 
 				// 对流比 = 有交互的流数量 / 总的流数量 (攻击时减小)
 				double interactionCommRate = (float) interactionCommCount / totalCommCount;
@@ -250,7 +250,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 				if (Integer.valueOf(FileUtils.readFile(CONFIG_PATH).trim()) >= 0) {
 					ATTACK_RATE++;
-					String outData = String.format("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n", attackRate,
+					String outData = String.format("%.2f,%.2f,%.2f,%.4f,%.2f,%.2f\n", attackRate,
 							flowTableMatchSuccessRate, interactionCommRate, floodRate, avgCommHostCount, avgFlowPacket);
 
 					FileUtils.writeFile(CONFIG_PATH, String.valueOf(ATTACK_RATE));
