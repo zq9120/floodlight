@@ -162,7 +162,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				ICHelper icSwList = new ICHelper(CONTROLLER_URL + "wm/core/controller/switches/json");
 				String dataSwList = icSwList.get();
 				JSONArray jsonSwList = new JSONArray(dataSwList);
-				for (int i = 0; i < jsonSwList.length(); ++i) {
+				int switchCount = jsonSwList.length();
+				for (int i = 0; i < switchCount; ++i) {
 					JSONObject sw = jsonSwList.getJSONObject(i);
 					String dpid = sw.getString("switchDPID");
 					ICHelper icAggregate = new ICHelper(CONTROLLER_URL + "wm/core/switch/" + dpid + "/aggregate/json");
@@ -200,7 +201,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				double attackRate = (float) attackCount / (PERIOD / 1000);
 
 				// 流表匹配成功率 = 1 - PACKET_IN数量 / 数据包的数量 (攻击时减小)
-				double flowTableMatchSuccessRate = 1 - ((float) packetInCount / packetCount);
+				double flowTableMatchSuccessRate = 1 - ((float) packetInCount * switchCount / packetCount);
 
 				// 对流比 = 有交互的流数量 / 总的流数量 (攻击时减小)
 				double interactionCommRate = (float) interactionCommCount / totalCommCount;
@@ -238,7 +239,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					avgFlowPacket = 0;
 
 				logger.info("attackRate = {} / ({} / 1000)", attackCount, PERIOD);
-				logger.info("flowTableMatchSuccessRate = 1 - ({} / {})", packetInCount, packetCount);
+				logger.info("flowTableMatchSuccessRate = 1 - ({} / {})", packetInCount * switchCount, packetCount);
 				logger.info("interactionCommRate = {} / {}", interactionCommCount, totalCommCount);
 				logger.info("floodRate = {} / {}", floodCount, forwardPacketInCount);
 				logger.info("avgCommHostCount = {} / {}", totalDstAddrCount, totalSrcAddrCount);
