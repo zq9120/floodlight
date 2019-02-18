@@ -65,7 +65,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	public void init(FloodlightModuleContext context) throws FloodlightModuleException {
 		// ATTACK 5 / ATTACK 60
 		// NORMAL 300 / NORMAL 3000
-		String dtDetectionConfig = FileUtils.readFile(DTDETECTION_CONFIG_PATH);
+		String dtDetectionConfig = FileUtils.readFile(DTDETECTION_CONFIG_PATH).trim();
 		if (dtDetectionConfig == null)
 			dtDetectionConfig = "ATTACK 1";
 		if (dtDetectionConfig.split(" ")[0].equals("ATTACK")) {
