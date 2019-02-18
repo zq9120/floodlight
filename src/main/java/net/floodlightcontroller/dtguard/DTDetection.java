@@ -200,7 +200,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				double attackRate = (float) attackCount / (PERIOD / 1000);
 
 				// 流表匹配成功率 = 1 - PACKET_IN数量 / 数据包的数量 (攻击时减小)
-				double flowTableMatchSuccessRate = 1 - ((float) packetInCount * 100 / packetCount);
+				double flowTableMatchSuccessRate = 1 - ((float) packetInCount / packetCount);
 
 				// 对流比 = 有交互的流数量 / 总的流数量 (攻击时减小)
 				double interactionCommRate = (float) interactionCommCount / totalCommCount;
