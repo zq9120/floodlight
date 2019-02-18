@@ -283,14 +283,14 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 					FileUtils.writeFile(CONFIG_PATH, String.valueOf(ATTACK_RATE));
 					FileUtils.writeFile(OUTDATA_PATH, FileUtils.readFile(OUTDATA_PATH) + outData);
-					// if (repeatCount++ == 300)
+					if (repeatCount++ == 3000)
+						System.exit(0);
+					// if (repeatCount++ == REPEAT_COUNT_LIMIT) {
+					// repeatCount = 0;
+					// ATTACK_RATE++;
+					// if (ATTACK_RATE >= 50)
 					// System.exit(0);
-					if (repeatCount++ == REPEAT_COUNT_LIMIT) {
-						repeatCount = 0;
-						ATTACK_RATE++;
-						if (ATTACK_RATE >= 50)
-							System.exit(0);
-					}
+					// }
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
