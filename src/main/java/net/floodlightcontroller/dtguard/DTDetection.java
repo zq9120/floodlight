@@ -65,9 +65,10 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	public void init(FloodlightModuleContext context) throws FloodlightModuleException {
 		// ATTACK 5 / ATTACK 60
 		// NORMAL 300 / NORMAL 3000
-		String dtDetectionConfig = FileUtils.readFile(DTDETECTION_CONFIG_PATH).trim();
+		String dtDetectionConfig = FileUtils.readFile(DTDETECTION_CONFIG_PATH);
 		if (dtDetectionConfig == null)
 			dtDetectionConfig = "ATTACK 1";
+		dtDetectionConfig = dtDetectionConfig.trim();
 		if (dtDetectionConfig.split(" ")[0].equals("ATTACK")) {
 			DETECTION_TYPE = DETECTION_TYPE_ATTACK;
 		} else {
@@ -308,8 +309,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					} else {
 						if (++repeatCount == REPEAT_COUNT_LIMIT) {
 							repeatCount = 0;
-							ATTACK_RATE++;
-							if (ATTACK_RATE >= 50)
+							ATTACK_RATE += 5;
+							if (ATTACK_RATE > 50)
 								System.exit(0);
 						}
 					}
