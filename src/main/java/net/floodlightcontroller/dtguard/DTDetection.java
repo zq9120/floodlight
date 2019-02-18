@@ -49,6 +49,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	protected static int attackCount = 0;
 
 	protected static final String CONTROLLER_URL = "http://127.0.0.1:8080/";
+	protected static final String DTDETECTION_CONFIG_PATH = "/home/zhangziqi/Documents/scripts/dtdetection_config.txt";
 	protected static final String CONFIG_PATH = "/home/zhangziqi/Documents/scripts/config.txt";
 	protected static final String OUTDATA_PATH = "/home/zhangziqi/Documents/scripts/statistic.csv";
 	protected static final int PERIOD = 10000;
@@ -56,8 +57,24 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	protected static int REPEAT_COUNT_LIMIT = 1;
 	protected static int repeatCount = 0;
 
+	protected static int DETECTION_TYPE = 0;
+	private final static int DETECTION_TYPE_ATTACK = 1;
+	private final static int DETECTION_TYPE_NORMAL = 0;
+
 	@Override
 	public void init(FloodlightModuleContext context) throws FloodlightModuleException {
+		// ATTACK 5 / ATTACK 60
+		// NORMAL 300 / NORMAL 3000
+		String dtDetectionConfig = FileUtils.readFile(DTDETECTION_CONFIG_PATH);
+		if (dtDetectionConfig == null)
+			dtDetectionConfig = "ATTACK 1";
+		if (dtDetectionConfig.split(" ")[0].equals("ATTACK")) {
+			DETECTION_TYPE = DETECTION_TYPE_ATTACK;
+		} else {
+			DETECTION_TYPE = DETECTION_TYPE_NORMAL;
+		}
+		REPEAT_COUNT_LIMIT = Integer.valueOf(dtDetectionConfig.split(" ")[1]);
+
 		FileUtils.writeFile(CONFIG_PATH, "-1");
 		FileUtils.writeFile(OUTDATA_PATH, "攻击速率,流表匹配成功率,对流比,FLOOD触发比例,平均通信主机数,目的IP地址熵值,FLOW_MOD比例,流包数均值\n");
 		floodlightProvider = context.getServiceImpl(IFloodlightProviderService.class);
@@ -201,7 +218,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				double attackRate = (float) attackCount / (PERIOD / 1000);
 
 				// 流表匹配成功率 = 1 - PACKET_IN数量 / 数据包的数量 (攻击时减小)
-				double flowTableMatchSuccessRate = 1 - ((float) packetInCount * switchCount / packetCount);
+				double flowTableMatchSuccessRate = 1 - ((float) packetInCount * switchCount * 10 / packetCount);
 
 				// 对流比 = 有交互的流数量 / 总的流数量 (攻击时减小)
 				double interactionCommRate = (float) interactionCommCount / totalCommCount;
@@ -239,7 +256,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					avgFlowPacket = 0;
 
 				logger.info("attackRate = {} / ({} / 1000)", attackCount, PERIOD);
-				logger.info("flowTableMatchSuccessRate = 1 - ({} / {})", packetInCount * switchCount, packetCount);
+				logger.info("flowTableMatchSuccessRate = 1 - ({} / {})", packetInCount * switchCount * 10, packetCount);
 				logger.info("interactionCommRate = {} / {}", interactionCommCount, totalCommCount);
 				logger.info("floodRate = {} / {}", floodCount, forwardPacketInCount);
 				logger.info("avgCommHostCount = {} / {}", totalDstAddrCount, totalSrcAddrCount);
@@ -284,13 +301,17 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 					FileUtils.writeFile(CONFIG_PATH, String.valueOf(ATTACK_RATE));
 					FileUtils.writeFile(OUTDATA_PATH, FileUtils.readFile(OUTDATA_PATH) + outData);
-					// if (repeatCount++ == 3000)
-					// System.exit(0);
-					if (++repeatCount == REPEAT_COUNT_LIMIT) {
-						repeatCount = 0;
-						ATTACK_RATE++;
-						if (ATTACK_RATE >= 50)
+
+					if (DETECTION_TYPE == DETECTION_TYPE_NORMAL) {
+						if (repeatCount++ == REPEAT_COUNT_LIMIT)
 							System.exit(0);
+					} else {
+						if (++repeatCount == REPEAT_COUNT_LIMIT) {
+							repeatCount = 0;
+							ATTACK_RATE++;
+							if (ATTACK_RATE >= 50)
+								System.exit(0);
+						}
 					}
 				}
 			} catch (IOException e) {
