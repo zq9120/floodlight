@@ -83,11 +83,11 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		commAddrMap = new ArrayList<String>();
 		commAddrList = new HashMap<String, List<String>>();
 		commAddrListFull = new HashMap<String, List<String>>();
-		// Timer timer = new Timer();
-		// timer.schedule(new StaticCalc(), PERIOD, PERIOD);
-
 		Timer timer = new Timer();
-		timer.schedule(new DefenseTask(), 5000, 5000);
+		timer.schedule(new StaticCalc(), PERIOD, PERIOD);
+		//
+		// Timer timer = new Timer();
+		// timer.schedule(new DefenseTask(), 5000, 5000);
 	}
 
 	@Override

@@ -8,12 +8,12 @@ import org.json.JSONObject;
 
 public class TrafficCollection {
 
-	public static int switchCount;
-	public static long topoMap[][];
-	public static String no2Dpid[];
-	public static Map<String, Integer> dpid2No;
-	public static Map<String, Map<String, Long>> portTraffic; // Map<dpid, Map<pordId, traffic>>
-	public final static int QUANT_RATE = 1000;
+	private static int switchCount;
+	private static long topoMap[][];
+	private static String no2Dpid[];
+	private static Map<String, Integer> dpid2No;
+	private static Map<String, Map<String, Long>> portTraffic; // Map<dpid, Map<pordId, traffic>>
+	private final static int QUANT_RATE = 1000;
 
 	public TrafficCollection() {
 		dpid2No = new HashMap<String, Integer>();
@@ -99,6 +99,10 @@ public class TrafficCollection {
 			}
 			System.out.println("\n");
 		}
+	}
+
+	public long[][] getTopoMap() {
+		return TrafficCollection.topoMap;
 	}
 
 }
