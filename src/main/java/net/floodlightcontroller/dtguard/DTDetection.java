@@ -53,7 +53,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	protected static final String OUTDATA_PATH = "/home/zhangziqi/Documents/scripts/statistic.csv";
 	protected static final int PERIOD = 10000;
 	protected static int ATTACK_RATE = 0;
-	protected static int REPEAT_COUNT_LIMIT = 5;
+	protected static int REPEAT_COUNT_LIMIT = 1;
 	protected static int repeatCount = 0;
 
 	@Override
@@ -285,7 +285,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					FileUtils.writeFile(OUTDATA_PATH, FileUtils.readFile(OUTDATA_PATH) + outData);
 					// if (repeatCount++ == 3000)
 					// System.exit(0);
-					if (repeatCount++ == REPEAT_COUNT_LIMIT) {
+					if (++repeatCount == REPEAT_COUNT_LIMIT) {
 						repeatCount = 0;
 						ATTACK_RATE++;
 						if (ATTACK_RATE >= 50)
