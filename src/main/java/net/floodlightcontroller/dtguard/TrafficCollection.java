@@ -8,11 +8,11 @@ import org.json.JSONObject;
 
 public class TrafficCollection {
 
-	private static int switchCount;
-	private static long topoMap[][];
-	private static String no2Dpid[];
-	private static Map<String, Integer> dpid2No;
-	private static Map<String, Map<String, Long>> portTraffic; // Map<dpid, Map<pordId, traffic>>
+	private int switchCount;
+	private int topoMap[][];
+	private String no2Dpid[];
+	private Map<String, Integer> dpid2No;
+	private Map<String, Map<String, Long>> portTraffic; // Map<dpid, Map<pordId, traffic>>
 	private final static int QUANT_RATE = 1000;
 
 	public TrafficCollection() {
@@ -36,7 +36,7 @@ public class TrafficCollection {
 		switchCount = jsonSwList.length();
 
 		// 初始化拓扑
-		topoMap = new long[switchCount][switchCount];
+		topoMap = new int[switchCount][switchCount];
 		for (int i = 0; i < switchCount; ++i)
 			for (int j = 0; j < switchCount; ++j)
 				topoMap[i][j] = 0;
@@ -81,13 +81,14 @@ public class TrafficCollection {
 			String srcDpid = jsonLinks.getJSONObject(i).getString("src-switch");
 			String dstDpid = jsonLinks.getJSONObject(i).getString("dst-switch");
 			int srcPort = jsonLinks.getJSONObject(i).getInt("src-port");
-			long weight;
+			int weight;
 			try {
-				weight = portTraffic.get(srcDpid).get(String.valueOf(srcPort)) / QUANT_RATE;
+				weight = (int) (portTraffic.get(srcDpid).get(String.valueOf(srcPort)) / QUANT_RATE);
 			} catch (Exception e) {
 				weight = 1;
 			}
 			topoMap[dpid2No.get(srcDpid)][dpid2No.get(dstDpid)] = weight;
+			topoMap[dpid2No.get(dstDpid)][dpid2No.get(srcDpid)] = weight;
 		}
 	}
 
@@ -101,8 +102,8 @@ public class TrafficCollection {
 		}
 	}
 
-	public long[][] getTopoMap() {
-		return TrafficCollection.topoMap;
+	public int[][] getTopoMap() {
+		return this.topoMap;
 	}
 
 }
