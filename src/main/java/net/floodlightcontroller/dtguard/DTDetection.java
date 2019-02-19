@@ -53,7 +53,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	protected static final String CONFIG_PATH = "/home/zhangziqi/Documents/scripts/config.txt";
 	protected static final String OUTDATA_PATH = "/home/zhangziqi/Documents/scripts/statistic.csv";
 	protected static final int PERIOD = 10000;
-	protected static int ATTACK_RATE = 0;
+	protected static int ATTACK_RATE = 5;
 	protected static int REPEAT_COUNT_LIMIT = 1;
 	protected static int repeatCount = 0;
 
@@ -77,17 +77,18 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		REPEAT_COUNT_LIMIT = Integer.valueOf(dtDetectionConfig.split(" ")[1]);
 
 		FileUtils.writeFile(CONFIG_PATH, "-1");
-		FileUtils.writeFile(OUTDATA_PATH, "攻击速率,流表匹配成功率,对流比,FLOOD触发比例,平均通信主机数,目的IP地址熵值,FLOW_MOD比例,流包数均值\n");
+		FileUtils.writeFile(OUTDATA_PATH,
+				"attackRate,flowTableMatchSuccessRate,interactionCommRate,floodRate,avgCommHostCount,entropy,flowModRate,avgFlowPacket\n");
 		floodlightProvider = context.getServiceImpl(IFloodlightProviderService.class);
 		logger = LoggerFactory.getLogger(DTDetection.class);
 		commAddrMap = new ArrayList<String>();
 		commAddrList = new HashMap<String, List<String>>();
 		commAddrListFull = new HashMap<String, List<String>>();
-		// Timer timer = new Timer();
-		// timer.schedule(new StaticCalc(), PERIOD, PERIOD);
-
 		Timer timer = new Timer();
-		timer.schedule(new DefenseTask(), 5000, 5000);
+		timer.schedule(new StaticCalc(), PERIOD, PERIOD);
+
+		// Timer timer = new Timer();
+		// timer.schedule(new DefenseTask(), 5000, 5000);
 	}
 
 	@Override
