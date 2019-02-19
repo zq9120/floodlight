@@ -53,7 +53,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	protected static final String CONFIG_PATH = "/home/zhangziqi/Documents/scripts/config.txt";
 	protected static final String OUTDATA_PATH = "/home/zhangziqi/Documents/scripts/statistic.csv";
 	protected static final int PERIOD = 10000;
-	protected static int ATTACK_RATE = 5;
+	protected static int ATTACK_RATE = 0;
 	protected static int REPEAT_COUNT_LIMIT = 1;
 	protected static int repeatCount = 0;
 
