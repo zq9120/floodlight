@@ -61,8 +61,11 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	private final static int DETECTION_TYPE_ATTACK = 1;
 	private final static int DETECTION_TYPE_NORMAL = 0;
 
+	private FloodlightModuleContext context;
+
 	@Override
 	public void init(FloodlightModuleContext context) throws FloodlightModuleException {
+		this.context = context;
 		// ATTACK 5 / ATTACK 60
 		// NORMAL 300 / NORMAL 3000
 		String dtDetectionConfig = FileUtils.readFile(DTDETECTION_CONFIG_PATH);
@@ -313,7 +316,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					} else {
 						if (++repeatCount == REPEAT_COUNT_LIMIT) {
 							repeatCount = 0;
-							ATTACK_RATE += 1;
+							ATTACK_RATE += 5;
 							if (ATTACK_RATE > 50)
 								System.exit(0);
 						}
@@ -360,7 +363,11 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		public void run() {
 			TrafficCollection trafficCollection = new TrafficCollection();
 			RouteCalc routeCalc = new RouteCalc(trafficCollection.getTopoMap());
-			routeCalc.getRoute();
+			int[] route = routeCalc.getRoute();
+			String[] no2Dpid = trafficCollection.getNo2Dpid();
+			FlowGen flowGen = new FlowGen(route, no2Dpid);
+			flowGen.init(context);
+			flowGen.genFlow();
 		}
 
 	}
