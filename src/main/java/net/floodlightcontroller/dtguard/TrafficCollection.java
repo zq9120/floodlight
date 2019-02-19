@@ -106,4 +106,8 @@ public class TrafficCollection {
 		return this.topoMap;
 	}
 
+	public String[] getNo2Dpid() {
+		return no2Dpid;
+	}
+
 }
