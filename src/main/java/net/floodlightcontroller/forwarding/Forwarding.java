@@ -1221,10 +1221,10 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
         OFMessageUtils.setInPort(pob, inPort);
         pob.setData(pi.getData());
 
-//        if (log.isTraceEnabled()) {
+        if (log.isTraceEnabled()) {
             log.info("Writing flood PacketOut switch={} packet-in={} packet-out={}",
                     new Object[] {sw, pi, pob.build()});
-//        }
+        }
         messageDamper.write(sw, pob.build());
 
         return;
