@@ -196,7 +196,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					JSONObject jsonAggregate = new JSONObject(dataAggregate);
 					flowCount += jsonAggregate.getJSONObject("aggregate").getInt("flow_count");
 					packetCount += jsonAggregate.getJSONObject("aggregate").getInt("packet_count");
-					byteCount += jsonAggregate.getJSONObject("aggregate").getInt("byte_count");
+					// byteCount += jsonAggregate.getJSONObject("aggregate").getInt("byte_count");
 				}
 
 				int totalCommCount, interactionCommCount;
