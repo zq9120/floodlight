@@ -318,7 +318,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 						if (++repeatCount == REPEAT_COUNT_LIMIT) {
 							repeatCount = 0;
 							ATTACK_RATE += 1;
-							if (ATTACK_RATE > 50)
+							if (ATTACK_RATE > 60)
 								System.exit(0);
 						}
 					}
