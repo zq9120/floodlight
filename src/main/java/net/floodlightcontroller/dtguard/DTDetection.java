@@ -34,12 +34,12 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 	protected IFloodlightProviderService floodlightProvider;
 	protected static Logger logger;
-	protected static List<String> commAddrMap; // 存储格式 src_mac-dst_mac，用于计算对流比
-	protected static int packetInCount = 0; // 收到packetIn数据包的数量，用于计算flood触发比例
-	public static int floodCount = 0; // 执行了flood操作的packetIn数据包数量，用于计算flood触发比例
-	public static int flowModCount = 0; // 下发流规则的数量，用于计算流包数均值
+	protected static List<String> commAddrMap; // 瀛樺偍鏍煎紡 src_mac-dst_mac锛岀敤浜庤绠楀娴佹瘮
+	protected static int packetInCount = 0; // 鏀跺埌packetIn鏁版嵁鍖呯殑鏁伴噺锛岀敤浜庤绠梖lood瑙﹀彂姣斾緥
+	public static int floodCount = 0; // 鎵ц浜唂lood鎿嶄綔鐨刾acketIn鏁版嵁鍖呮暟閲忥紝鐢ㄤ簬璁＄畻flood瑙﹀彂姣斾緥
+	public static int flowModCount = 0; // 涓嬪彂娴佽鍒欑殑鏁伴噺锛岀敤浜庤绠楁祦鍖呮暟鍧囧��
 	public static int forwardPacketInCount = 0;
-	protected static Map<String, List<String>> commAddrList; // Map<srcMac, List<dstMac>>，用于计算目的IP地址熵值
+	protected static Map<String, List<String>> commAddrList; // Map<srcMac, List<dstMac>>锛岀敤浜庤绠楃洰鐨処P鍦板潃鐔靛��
 	protected static Map<String, List<String>> commAddrListFull;
 
 	protected static int flowCount = 0;
@@ -201,7 +201,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 				int totalCommCount, interactionCommCount;
 				synchronized (commAddrMap) {
-					totalCommCount = commAddrMap.size(); // 总的流数量
+					totalCommCount = commAddrMap.size(); // 鎬荤殑娴佹暟閲�
 					interactionCommCount = 0;
 					for (int i = 0; i < commAddrMap.size(); ++i) {
 						String val = commAddrMap.get(i);
@@ -223,27 +223,27 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					}
 				}
 
-				// 攻击速率
+				// 鏀诲嚮閫熺巼
 				double attackRate = (float) attackCount / (PERIOD / 1000);
 
-				// 流表匹配成功率 = 1 - PACKET_IN数量 / 数据包的数量 (攻击时减小)
+				// 娴佽〃鍖归厤鎴愬姛鐜� = 1 - PACKET_IN鏁伴噺 / 鏁版嵁鍖呯殑鏁伴噺 (鏀诲嚮鏃跺噺灏�)
 				double flowTableMatchSuccessRate = 1 - ((float) packetInCount * switchCount * 10 / packetCount);
 
-				// 对流比 = 有交互的流数量 / 总的流数量 (攻击时减小)
+				// 瀵规祦姣� = 鏈変氦浜掔殑娴佹暟閲� / 鎬荤殑娴佹暟閲� (鏀诲嚮鏃跺噺灏�)
 				double interactionCommRate = (float) interactionCommCount / totalCommCount;
 
-				// FLOOD触发比例 = 触发FLOOD操作的PACKET_IN数量 / PACKET_IN数量 (攻击时增大)
+				// FLOOD瑙﹀彂姣斾緥 = 瑙﹀彂FLOOD鎿嶄綔鐨凱ACKET_IN鏁伴噺 / PACKET_IN鏁伴噺 (鏀诲嚮鏃跺澶�)
 				double floodRate = (float) floodCount / forwardPacketInCount;
 
-				// 平均通信主机数 = 目的IP地址数 / 源IP地址数 (攻击时增大)
+				// 骞冲潎閫氫俊涓绘満鏁� = 鐩殑IP鍦板潃鏁� / 婧怚P鍦板潃鏁� (鏀诲嚮鏃跺澶�)
 				double avgCommHostCount = (float) totalDstAddrCount / totalSrcAddrCount;
 
 				double entropy = entropy();
 
-				// FLOW_MOD比例 = 下发流规则的数量 / PACKET_IN数量 (攻击时减小)
+				// FLOW_MOD姣斾緥 = 涓嬪彂娴佽鍒欑殑鏁伴噺 / PACKET_IN鏁伴噺 (鏀诲嚮鏃跺噺灏�)
 				double flowModRate = (float) flowModCount / packetInCount;
 
-				// 流包数均值 = 下发流规则的数量 / 数据包的数量 (攻击时增大)
+				// 娴佸寘鏁板潎鍊� = 涓嬪彂娴佽鍒欑殑鏁伴噺 / 鏁版嵁鍖呯殑鏁伴噺 (鏀诲嚮鏃跺澶�)
 				double avgFlowPacket = (float) packetCount / flowCount;
 
 				if (packetCount == 0)
@@ -317,7 +317,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					} else {
 						if (++repeatCount == REPEAT_COUNT_LIMIT) {
 							repeatCount = 0;
-							ATTACK_RATE += 5;
+							ATTACK_RATE += 1;
 							if (ATTACK_RATE > 50)
 								System.exit(0);
 						}
