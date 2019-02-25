@@ -367,8 +367,12 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 			int[] route = routeCalc.getRoute();
 			String[] no2Dpid = trafficCollection.getNo2Dpid();
 			FlowGen flowGen = new FlowGen(route, no2Dpid);
-			flowGen.init(context);
-			flowGen.genFlow();
+			try {
+				flowGen.genCommonFlow();
+				flowGen.genFlow();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
