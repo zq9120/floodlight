@@ -647,7 +647,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 			log.debug(
 					"Packet destination is known, but packet was not received on an edge port (rx on {}/{}). Flooding packet",
 					srcSw, srcPort);
-			doFlood(sw, pi, decision, cntx);
+			doFloodMigrate(sw, pi, decision, cntx);
 			return;
 		}
 
@@ -1158,8 +1158,38 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 	 * @param cntx     The FloodlightContext associated with this OFPacketIn
 	 */
 	protected void doFlood(IOFSwitch sw, OFPacketIn pi, IRoutingDecision decision, FloodlightContext cntx) {
+		OFPort inPort = OFMessageUtils.getInPort(pi);
+		OFPacketOut.Builder pob = sw.getOFFactory().buildPacketOut();
+		List<OFAction> actions = new ArrayList<>();
+		Set<OFPort> broadcastPorts = this.topologyService.getSwitchBroadcastPorts(sw.getId());
+
+		if (broadcastPorts.isEmpty()) {
+			log.debug("No broadcast ports found. Using FLOOD output action");
+			broadcastPorts = Collections.singleton(OFPort.FLOOD);
+		}
+
+		for (OFPort p : broadcastPorts) {
+			if (p.equals(inPort))
+				continue;
+			actions.add(sw.getOFFactory().actions().output(p, Integer.MAX_VALUE));
+		}
+		pob.setActions(actions);
+
+		// set buffer-id, in-port and packet-data based on packet-in
+		pob.setBufferId(OFBufferId.NO_BUFFER);
+		OFMessageUtils.setInPort(pob, inPort);
+		pob.setData(pi.getData());
+
+		if (log.isTraceEnabled()) {
+			log.info("Writing flood PacketOut switch={} packet-in={} packet-out={}",
+					new Object[] { sw, pi, pob.build() });
+		}
+		messageDamper.write(sw, pob.build());
+		return;
+	}
+
+	protected void doFloodMigrate(IOFSwitch sw, OFPacketIn pi, IRoutingDecision decision, FloodlightContext cntx) {
 		if (FlowGen.flowGenStatus) {
-//			log.info("Migration enabled.");
 			DatapathId switchDPID = null;
 			for (DatapathId dpid : switchService.getAllSwitchDpids()) {
 				dpid.toString().equals(FlowGen.rootDpid);
@@ -1168,7 +1198,6 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 			if (switchDPID == null) {
 				return;
 			}
-//			log.info("root dpid: {}", switchDPID.toString());
 			IOFSwitch swRoot = switchService.getSwitch(switchDPID);
 			OFPort inPort = OFMessageUtils.getInPort(pi);
 			OFPacketOut.Builder pob = swRoot.getOFFactory().buildPacketOut();
@@ -1202,35 +1231,8 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 			}
 			messageDamper.write(swRoot, pob.build());
 		} else {
-			OFPort inPort = OFMessageUtils.getInPort(pi);
-			OFPacketOut.Builder pob = sw.getOFFactory().buildPacketOut();
-			List<OFAction> actions = new ArrayList<>();
-			Set<OFPort> broadcastPorts = this.topologyService.getSwitchBroadcastPorts(sw.getId());
-
-			if (broadcastPorts.isEmpty()) {
-				log.debug("No broadcast ports found. Using FLOOD output action");
-				broadcastPorts = Collections.singleton(OFPort.FLOOD);
-			}
-
-			for (OFPort p : broadcastPorts) {
-				if (p.equals(inPort))
-					continue;
-				actions.add(sw.getOFFactory().actions().output(p, Integer.MAX_VALUE));
-			}
-			pob.setActions(actions);
-
-			// set buffer-id, in-port and packet-data based on packet-in
-			pob.setBufferId(OFBufferId.NO_BUFFER);
-			OFMessageUtils.setInPort(pob, inPort);
-			pob.setData(pi.getData());
-
-			if (log.isTraceEnabled()) {
-				log.info("Writing flood PacketOut switch={} packet-in={} packet-out={}",
-						new Object[] { sw, pi, pob.build() });
-			}
-			messageDamper.write(sw, pob.build());
+			doFlood(sw, pi, decision, cntx);
 		}
-		return;
 	}
 
 	/**
