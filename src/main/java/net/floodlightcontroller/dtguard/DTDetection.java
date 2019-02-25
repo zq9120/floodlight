@@ -374,7 +374,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					flowGen.genCommonFlow();
 					flowGen.genFlow();
 					FlowGen.rootDpid = no2Dpid[0];
-//					FlowGen.flowGenStatus = true;
+					FlowGen.flowGenStatus = true;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
