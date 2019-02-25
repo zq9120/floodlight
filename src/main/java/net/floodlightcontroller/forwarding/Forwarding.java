@@ -647,7 +647,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 			log.debug(
 					"Packet destination is known, but packet was not received on an edge port (rx on {}/{}). Flooding packet",
 					srcSw, srcPort);
-			doFloodMigrate(sw, pi, decision, cntx);
+//			doFloodMigrate(sw, pi, decision, cntx);
 			return;
 		}
 
