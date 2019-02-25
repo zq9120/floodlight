@@ -48,9 +48,11 @@ public class FlowGen {
 		for (int i = 1; i < no2Dpid.length; i++) {
 			JSONObject params = new JSONObject();
 			params.put("switch", no2Dpid[i]);
-			params.put("tos-bits", "0xef");
 			params.put("name", "dt-guard-c" + i);
 			params.put("priority", "50");
+			params.put("idle_timeout", "0");
+			params.put("hard_timeout", "0");
+			params.put("eth_dst", "ff:ff:ff:ff:ff:ff");
 			params.put("active", "true");
 			ICHelper ic = new ICHelper(DTDetection.CONTROLLER_URL + "wm/staticflowentrypusher/json");
 			ic.post(params.toString());
@@ -68,12 +70,15 @@ public class FlowGen {
 					int srcPort = dstList.get(srcDpid);
 					JSONObject params = new JSONObject();
 					params.put("switch", no2Dpid[i]);
-					params.put("src-port", String.valueOf(srcPort));
-					params.put("tos-bits", "0xef");
-					params.put("name", "dt-guard-c" + i);
+					params.put("name", "dt-guard-p" + i);
 					params.put("priority", "1");
+					params.put("idle_timeout", "0");
+					params.put("hard_timeout", "0");
+					params.put("eth_dst", "ff:ff:ff:ff:ff:ff");
+					params.put("in_port", String.valueOf(srcPort));
 					params.put("active", "true");
-					params.put("action", "output=flood");
+					params.put("actions", "output=flood");
+
 					ICHelper ic = new ICHelper(DTDetection.CONTROLLER_URL + "wm/staticflowentrypusher/json");
 					ic.post(params.toString());
 				}
