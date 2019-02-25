@@ -28,7 +28,7 @@ public class FlowGen {
 		ICHelper icLinks = new ICHelper(DTDetection.CONTROLLER_URL + "wm/topology/links/json");
 		String dataLinks = icLinks.get();
 		JSONArray jsonLinks = new JSONArray(dataLinks);
-
+		System.out.println("========== link info ==========");
 		for (int i = 0; i < jsonLinks.length(); ++i) {
 			String srcDpid = jsonLinks.getJSONObject(i).getString("src-switch");
 			String dstDpid = jsonLinks.getJSONObject(i).getString("dst-switch");
@@ -41,6 +41,7 @@ public class FlowGen {
 			}
 			dstList.put(srcDpid, dstPort);
 			linkInfo.put(dstDpid, dstList);
+			System.out.println(dstDpid + "\t" + srcDpid + "\t" + dstPort);
 		}
 	}
 
@@ -66,7 +67,7 @@ public class FlowGen {
 
 	public void genFlow() {
 		for (int i = 1; i < route.length; i++) {
-			System.out.println("add path: " + no2Dpid[route[i]] + " - " + no2Dpid[i] + "\t");
+			System.out.print("add path: " + no2Dpid[route[i]] + " - " + no2Dpid[i] + "\t");
 			String srcDpid = no2Dpid[route[i]];
 			String dstDpid = no2Dpid[i];
 			if (linkInfo.containsKey(dstDpid)) {
@@ -90,7 +91,12 @@ public class FlowGen {
 					} catch (Exception e) {
 						continue;
 					}
+					System.out.println("succeed");
+				} else {
+					System.out.println("failed 1");
 				}
+			} else {
+				System.out.println("failed 2");
 			}
 		}
 	}
