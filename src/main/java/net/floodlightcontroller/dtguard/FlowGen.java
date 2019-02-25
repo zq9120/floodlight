@@ -40,6 +40,7 @@ public class FlowGen {
 				dstList = new HashMap<String, Integer>();
 			}
 			dstList.put(srcDpid, dstPort);
+			linkInfo.put(dstDpid, dstList);
 		}
 	}
 
