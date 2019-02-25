@@ -1159,7 +1159,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 	 */
 	protected void doFlood(IOFSwitch sw, OFPacketIn pi, IRoutingDecision decision, FloodlightContext cntx) {
 		if (FlowGen.flowGenStatus) {
-			log.info("Migration enabled.");
+//			log.info("Migration enabled.");
 			DatapathId switchDPID = null;
 			for (DatapathId dpid : switchService.getAllSwitchDpids()) {
 				dpid.toString().equals(FlowGen.rootDpid);
@@ -1168,7 +1168,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 			if (switchDPID == null) {
 				return;
 			}
-			log.info("root dpid: {}", switchDPID.toString());
+//			log.info("root dpid: {}", switchDPID.toString());
 			IOFSwitch swRoot = switchService.getSwitch(switchDPID);
 			OFPort inPort = OFMessageUtils.getInPort(pi);
 			OFPacketOut.Builder pob = swRoot.getOFFactory().buildPacketOut();
