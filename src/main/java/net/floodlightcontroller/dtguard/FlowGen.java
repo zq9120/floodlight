@@ -46,6 +46,7 @@ public class FlowGen {
 
 	public void genCommonFlow() {
 		for (int i = 1; i < no2Dpid.length; i++) {
+			System.out.println("add common flow to: " + no2Dpid[i]);
 			JSONObject params = new JSONObject();
 			params.put("switch", no2Dpid[i]);
 			params.put("name", "dt-guard-c" + i);
@@ -65,7 +66,7 @@ public class FlowGen {
 
 	public void genFlow() {
 		for (int i = 1; i < route.length; i++) {
-			System.out.println(no2Dpid[route[i]] + " - " + no2Dpid[i] + "\t");
+			System.out.println("add path: " + no2Dpid[route[i]] + " - " + no2Dpid[i] + "\t");
 			String srcDpid = no2Dpid[route[i]];
 			String dstDpid = no2Dpid[i];
 			if (linkInfo.containsKey(dstDpid)) {
