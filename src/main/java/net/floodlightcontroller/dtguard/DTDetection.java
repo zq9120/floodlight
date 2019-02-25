@@ -91,7 +91,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 //		timer.schedule(new StaticCalc(), PERIOD, PERIOD);
 
 		Timer timer = new Timer();
-		timer.schedule(new DefenseTask(), 5000, 5000);
+		timer.schedule(new DefenseTask(), PERIOD, PERIOD);
 	}
 
 	@Override
@@ -363,6 +363,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		@Override
 		public void run() {
 			try {
+				if (FlowGen.flowGenStatus)
+					return;
 				TrafficCollection trafficCollection = new TrafficCollection();
 				RouteCalc routeCalc = new RouteCalc(trafficCollection.getTopoMap());
 				int[] route = routeCalc.getRoute();
@@ -370,6 +372,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				FlowGen flowGen = new FlowGen(route, no2Dpid);
 				flowGen.genCommonFlow();
 				flowGen.genFlow();
+				FlowGen.rootDpid = no2Dpid[0];
+				FlowGen.flowGenStatus = true;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

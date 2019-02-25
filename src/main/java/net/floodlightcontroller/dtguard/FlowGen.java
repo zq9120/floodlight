@@ -11,6 +11,8 @@ public class FlowGen {
 	private int[] route;
 	private String no2Dpid[];
 	private Map<String, Map<String, Integer>> linkInfo; // Map<dstDpid, Map<srcDpid, dstPort>>
+	public static boolean flowGenStatus = false;
+	public static String rootDpid = "";
 
 	public FlowGen(int[] route, String[] no2Dpid) {
 		this.route = route;
