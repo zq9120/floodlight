@@ -48,7 +48,7 @@ public class FlowGen {
 			params.put("switch", no2Dpid[i]);
 			params.put("tos-bits", "0xef");
 			params.put("name", "dt-guard-c" + i);
-			params.put("priority", "0xef");
+			params.put("priority", "50");
 			params.put("active", "true");
 			ICHelper ic = new ICHelper(DTDetection.CONTROLLER_URL + "wm/staticflowentrypusher/json");
 			ic.post(params.toString());
@@ -69,7 +69,7 @@ public class FlowGen {
 					params.put("src-port", String.valueOf(srcPort));
 					params.put("tos-bits", "0xef");
 					params.put("name", "dt-guard-c" + i);
-					params.put("priority", "0xef");
+					params.put("priority", "1");
 					params.put("active", "true");
 					params.put("action", "output=flood");
 					ICHelper ic = new ICHelper(DTDetection.CONTROLLER_URL + "wm/staticflowentrypusher/json");
