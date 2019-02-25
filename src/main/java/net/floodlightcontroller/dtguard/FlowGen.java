@@ -66,7 +66,7 @@ public class FlowGen {
 			params.put("priority", "50");
 			params.put("idle_timeout", "0");
 			params.put("hard_timeout", "0");
-			params.put("eth_dst", "ff:ff:ff:ff:ff:ff");
+			params.put("eth_dst", "ff:ff:ff:ff:ff:fc");
 			params.put("active", "true");
 			ICHelper ic = new ICHelper(DTDetection.CONTROLLER_URL + "wm/staticflowentrypusher/json");
 			try {
@@ -92,7 +92,7 @@ public class FlowGen {
 					params.put("priority", "1");
 					params.put("idle_timeout", "0");
 					params.put("hard_timeout", "0");
-					params.put("eth_dst", "ff:ff:ff:ff:ff:ff");
+					params.put("eth_dst", "ff:ff:ff:ff:ff:fc");
 					params.put("in_port", String.valueOf(srcPort));
 					params.put("active", "true");
 					params.put("actions", "output=flood");

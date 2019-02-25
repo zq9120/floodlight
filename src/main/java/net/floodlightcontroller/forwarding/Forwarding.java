@@ -1193,7 +1193,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 
 			Ethernet eth = new Ethernet();
 			eth.deserialize(pi.getData(), 0, pi.getData().length);
-			eth.setDestinationMACAddress("ff:ff:ff:ff:ff:ff");
+			eth.setDestinationMACAddress("ff:ff:ff:ff:ff:fc");
 			pob.setData(eth.serialize());
 
 			if (log.isTraceEnabled()) {
