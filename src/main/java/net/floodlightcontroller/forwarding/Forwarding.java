@@ -596,7 +596,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 			FloodlightContext cntx) {
 		if (isBroadcastOrMulticast(eth)) {
 			DTDetection.floodCount++;
-			doFlood(sw, pi, decision, cntx);
+//			doFlood(sw, pi, decision, cntx);
 		} else {
 			doL2ForwardFlow(sw, pi, decision, cntx, false);
 		}
@@ -647,7 +647,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 			log.debug(
 					"Packet destination is known, but packet was not received on an edge port (rx on {}/{}). Flooding packet",
 					srcSw, srcPort);
-//			doFloodMigrate(sw, pi, decision, cntx);
+			doFlood(sw, pi, decision, cntx);
 			return;
 		}
 
