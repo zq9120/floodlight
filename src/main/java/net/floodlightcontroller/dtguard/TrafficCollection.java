@@ -76,7 +76,6 @@ public class TrafficCollection {
 		ICHelper icLinks = new ICHelper(DTDetection.CONTROLLER_URL + "wm/topology/links/json");
 		String dataLinks = icLinks.get();
 		JSONArray jsonLinks = new JSONArray(dataLinks);
-		System.out.println(dataLinks);
 		for (int i = 0; i < jsonLinks.length(); ++i) {
 			String srcDpid = jsonLinks.getJSONObject(i).getString("src-switch");
 			String dstDpid = jsonLinks.getJSONObject(i).getString("dst-switch");
