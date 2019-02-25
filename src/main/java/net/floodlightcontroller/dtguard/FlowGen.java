@@ -32,16 +32,28 @@ public class FlowGen {
 		for (int i = 0; i < jsonLinks.length(); ++i) {
 			String srcDpid = jsonLinks.getJSONObject(i).getString("src-switch");
 			String dstDpid = jsonLinks.getJSONObject(i).getString("dst-switch");
-			int dstPort = jsonLinks.getJSONObject(i).getInt("src-port");
+			int srcPort = jsonLinks.getJSONObject(i).getInt("src-port");
+			int dstPort = jsonLinks.getJSONObject(i).getInt("dst-port");
+
 			Map<String, Integer> dstList;
 			if (linkInfo.containsKey(dstDpid)) {
 				dstList = linkInfo.get(dstDpid);
 			} else {
 				dstList = new HashMap<String, Integer>();
 			}
-			dstList.put(srcDpid, dstPort);
+			dstList.put(srcDpid, srcPort);
 			linkInfo.put(dstDpid, dstList);
-			System.out.println(dstDpid + "\t" + srcDpid + "\t" + dstPort);
+
+			Map<String, Integer> srcList;
+			if (linkInfo.containsKey(srcDpid)) {
+				srcList = linkInfo.get(srcDpid);
+			} else {
+				srcList = new HashMap<String, Integer>();
+			}
+			srcList.put(dstDpid, dstPort);
+			linkInfo.put(srcDpid, srcList);
+
+			System.out.println(srcDpid + " " + srcPort + "\t->\t" + dstDpid + " " + dstPort);
 		}
 	}
 
