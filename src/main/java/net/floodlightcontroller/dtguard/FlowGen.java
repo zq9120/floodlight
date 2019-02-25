@@ -1,6 +1,5 @@
 package net.floodlightcontroller.dtguard;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +43,7 @@ public class FlowGen {
 		}
 	}
 
-	public void genCommonFlow() throws IOException {
+	public void genCommonFlow() {
 		for (int i = 1; i < no2Dpid.length; i++) {
 			JSONObject params = new JSONObject();
 			params.put("switch", no2Dpid[i]);
@@ -55,13 +54,17 @@ public class FlowGen {
 			params.put("eth_dst", "ff:ff:ff:ff:ff:ff");
 			params.put("active", "true");
 			ICHelper ic = new ICHelper(DTDetection.CONTROLLER_URL + "wm/staticflowentrypusher/json");
-			ic.post(params.toString());
+			try {
+				ic.post(params.toString());
+			} catch (Exception e) {
+				continue;
+			}
 		}
 	}
 
-	public void genFlow() throws IOException {
+	public void genFlow() {
 		for (int i = 1; i < route.length; i++) {
-			System.out.println(route[i] + " - " + i + "\t");
+			System.out.println(no2Dpid[route[i]] + " - " + no2Dpid[i] + "\t");
 			String srcDpid = no2Dpid[route[i]];
 			String dstDpid = no2Dpid[i];
 			if (linkInfo.containsKey(dstDpid)) {
@@ -80,7 +83,11 @@ public class FlowGen {
 					params.put("actions", "output=flood");
 
 					ICHelper ic = new ICHelper(DTDetection.CONTROLLER_URL + "wm/staticflowentrypusher/json");
-					ic.post(params.toString());
+					try {
+						ic.post(params.toString());
+					} catch (Exception e) {
+						continue;
+					}
 				}
 			}
 		}
