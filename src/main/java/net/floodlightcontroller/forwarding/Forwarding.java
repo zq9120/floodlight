@@ -596,7 +596,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 			FloodlightContext cntx) {
 		if (isBroadcastOrMulticast(eth)) {
 			DTDetection.floodCount++;
-//			doFlood(sw, pi, decision, cntx);
+			doFlood(sw, pi, decision, cntx);
 		} else {
 			doL2ForwardFlow(sw, pi, decision, cntx, false);
 		}
