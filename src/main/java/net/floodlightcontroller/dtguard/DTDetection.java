@@ -52,6 +52,10 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	protected static final String DTDETECTION_CONFIG_PATH = "/home/zhangziqi/Documents/scripts/dtdetection_config.txt";
 	protected static final String CONFIG_PATH = "/home/zhangziqi/Documents/scripts/config.txt";
 	protected static final String OUTDATA_PATH = "/home/zhangziqi/Documents/scripts/statistic.csv";
+	protected static final String OVERHEAD_1 = "/home/zhangziqi/Documents/scripts/overhead_1.txt";
+	protected static final String OVERHEAD_2 = "/home/zhangziqi/Documents/scripts/overhead_2.txt";
+	protected static final String OVERHEAD_3 = "/home/zhangziqi/Documents/scripts/overhead_3.txt";
+	public static final String OVERHEAD_4 = "/home/zhangziqi/Documents/scripts/overhead_4.txt";
 	protected static final int PERIOD = 10000;
 	protected static int ATTACK_RATE = 0;
 	protected static int REPEAT_COUNT_LIMIT = 1;
@@ -68,6 +72,10 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		this.context = context;
 		// ATTACK 5 / ATTACK 60
 		// NORMAL 300 / NORMAL 3000
+		FileUtils.writeFile(OVERHEAD_1, "");
+		FileUtils.writeFile(OVERHEAD_2, "");
+		FileUtils.writeFile(OVERHEAD_3, "");
+		FileUtils.writeFile(OVERHEAD_4, "");
 		String dtDetectionConfig = FileUtils.readFile(DTDETECTION_CONFIG_PATH);
 		if (dtDetectionConfig == null)
 			dtDetectionConfig = "ATTACK 1";
@@ -90,8 +98,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		Timer timer = new Timer();
 		timer.schedule(new StaticCalc(), PERIOD, PERIOD);
 
-//		Timer timer = new Timer();
-//		timer.schedule(new DefenseTask(), PERIOD, PERIOD);
+		Timer timer2 = new Timer();
+		timer2.schedule(new DefenseTask(), PERIOD, PERIOD);
 	}
 
 	@Override
@@ -125,6 +133,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	public Command receive(IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
 		switch (msg.getType()) {
 		case PACKET_IN:
+			long start_ts = System.nanoTime();
 			Ethernet eth = IFloodlightProviderService.bcStore.get(cntx, IFloodlightProviderService.CONTEXT_PI_PAYLOAD);
 			if (eth.getEtherType() != EthType.IPv4)
 				break;
@@ -161,6 +170,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 			dstListFull.add(dstIP);
 
 			packetInCount++;
+			long end_ts = System.nanoTime();
+			FileUtils.writeFile(OVERHEAD_1, FileUtils.readFile(OVERHEAD_1) + String.valueOf(end_ts - start_ts) + "\n");
 			break;
 		default:
 			break;
@@ -182,6 +193,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 		public void run() {
 			try {
+				long start_ts = System.nanoTime();
 				logger.info("======== StaticCalc ========");
 
 				ICHelper icSwList = new ICHelper(CONTROLLER_URL + "wm/core/controller/switches/json");
@@ -323,6 +335,9 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 						}
 					}
 				}
+				long end_ts = System.nanoTime();
+				FileUtils.writeFile(OVERHEAD_2,
+						FileUtils.readFile(OVERHEAD_2) + String.valueOf(end_ts - start_ts) + "\n");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -365,6 +380,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 			try {
 				if (FlowGen.flowGenStatus)
 					return;
+				long start_ts = System.nanoTime();
 				TrafficCollection trafficCollection = new TrafficCollection();
 				if (trafficCollection.getTopoMap().length != 0) {
 					RouteCalc routeCalc = new RouteCalc(trafficCollection.getTopoMap());
@@ -376,6 +392,9 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					FlowGen.rootDpid = no2Dpid[0];
 					FlowGen.flowGenStatus = true;
 				}
+				long end_ts = System.nanoTime();
+				FileUtils.writeFile(OVERHEAD_3,
+						FileUtils.readFile(OVERHEAD_3) + String.valueOf(end_ts - start_ts) + "\n");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

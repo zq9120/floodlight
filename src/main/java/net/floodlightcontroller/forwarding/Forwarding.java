@@ -39,6 +39,7 @@ import net.floodlightcontroller.devicemanager.IDeviceListener;
 import net.floodlightcontroller.devicemanager.IDeviceService;
 import net.floodlightcontroller.devicemanager.SwitchPort;
 import net.floodlightcontroller.dtguard.DTDetection;
+import net.floodlightcontroller.dtguard.FileUtils;
 import net.floodlightcontroller.dtguard.FlowGen;
 import net.floodlightcontroller.linkdiscovery.ILinkDiscoveryListener;
 import net.floodlightcontroller.linkdiscovery.ILinkDiscoveryService;
@@ -200,6 +201,7 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 	public Command processPacketInMessage(IOFSwitch sw, OFPacketIn pi, IRoutingDecision decision,
 			FloodlightContext cntx) {
 		DTDetection.forwardPacketInCount++;
+		long start_ts = System.nanoTime();
 		Ethernet eth = IFloodlightProviderService.bcStore.get(cntx, IFloodlightProviderService.CONTEXT_PI_PAYLOAD);
 
 		OFPort inPort = OFMessageUtils.getInPort(pi);
@@ -270,7 +272,9 @@ public class Forwarding extends ForwardingBase implements IFloodlightModule, IOF
 			}
 
 		}
-
+		long end_ts = System.nanoTime();
+		FileUtils.writeFile(DTDetection.OVERHEAD_4,
+				FileUtils.readFile(DTDetection.OVERHEAD_4) + String.valueOf(end_ts - start_ts) + "\n");
 		return Command.CONTINUE;
 	}
 
