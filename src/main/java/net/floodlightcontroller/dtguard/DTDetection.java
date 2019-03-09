@@ -56,6 +56,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	protected static final String OVERHEAD_2 = "/home/zhangziqi/Documents/scripts/overhead_2.txt";
 	protected static final String OVERHEAD_3 = "/home/zhangziqi/Documents/scripts/overhead_3.txt";
 	public static final String OVERHEAD_4 = "/home/zhangziqi/Documents/scripts/overhead_4.txt";
+	public static final String OVERHEAD_5 = "/home/zhangziqi/Documents/scripts/overhead_5.txt";
+	public static final String OVERHEAD_6 = "/home/zhangziqi/Documents/scripts/overhead_6.txt";
 	protected static final int PERIOD = 10000;
 	protected static int ATTACK_RATE = 0;
 	protected static int REPEAT_COUNT_LIMIT = 1;
@@ -76,6 +78,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		FileUtils.writeFile(OVERHEAD_2, "");
 		FileUtils.writeFile(OVERHEAD_3, "");
 		FileUtils.writeFile(OVERHEAD_4, "");
+		FileUtils.writeFile(OVERHEAD_5, "");
+		FileUtils.writeFile(OVERHEAD_6, "");
 		String dtDetectionConfig = FileUtils.readFile(DTDETECTION_CONFIG_PATH);
 		if (dtDetectionConfig == null)
 			dtDetectionConfig = "ATTACK 1";
@@ -98,8 +102,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		Timer timer = new Timer();
 		timer.schedule(new StaticCalc(), PERIOD, PERIOD);
 
-		Timer timer2 = new Timer();
-		timer2.schedule(new DefenseTask(), PERIOD, PERIOD);
+//		Timer timer2 = new Timer();
+//		timer2.schedule(new DefenseTask(), PERIOD, PERIOD);
 	}
 
 	@Override
@@ -383,18 +387,30 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 				long start_ts = System.nanoTime();
 				TrafficCollection trafficCollection = new TrafficCollection();
 				if (trafficCollection.getTopoMap().length != 0) {
+					long end_ts = System.nanoTime();
+					FileUtils.writeFile(OVERHEAD_3,
+							FileUtils.readFile(OVERHEAD_3) + String.valueOf(end_ts - start_ts) + "\n");
+
+					long start_ts1 = System.nanoTime();
 					RouteCalc routeCalc = new RouteCalc(trafficCollection.getTopoMap());
 					int[] route = routeCalc.getRoute();
+					long end_ts1 = System.nanoTime();
+					FileUtils.writeFile(OVERHEAD_4,
+							FileUtils.readFile(OVERHEAD_4) + String.valueOf(end_ts1 - start_ts1) + "\n");
+
+					long start_ts2 = System.nanoTime();
 					String[] no2Dpid = trafficCollection.getNo2Dpid();
 					FlowGen flowGen = new FlowGen(route, no2Dpid);
 					flowGen.genCommonFlow();
 					flowGen.genFlow();
 					FlowGen.rootDpid = no2Dpid[0];
 					FlowGen.flowGenStatus = true;
+					long end_ts2 = System.nanoTime();
+					FileUtils.writeFile(OVERHEAD_5,
+							FileUtils.readFile(OVERHEAD_5) + String.valueOf(end_ts2 - start_ts2) + "\n");
+
 				}
-				long end_ts = System.nanoTime();
-				FileUtils.writeFile(OVERHEAD_3,
-						FileUtils.readFile(OVERHEAD_3) + String.valueOf(end_ts - start_ts) + "\n");
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
