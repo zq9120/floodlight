@@ -102,8 +102,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		Timer timer = new Timer();
 		timer.schedule(new StaticCalc(), PERIOD, PERIOD);
 
-//		Timer timer2 = new Timer();
-//		timer2.schedule(new DefenseTask(), PERIOD, PERIOD);
+		Timer timer2 = new Timer();
+		timer2.schedule(new DefenseTask(), PERIOD, PERIOD);
 	}
 
 	@Override
