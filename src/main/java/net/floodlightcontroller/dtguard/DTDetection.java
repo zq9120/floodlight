@@ -382,8 +382,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		@Override
 		public void run() {
 			try {
-				if (FlowGen.flowGenStatus)
-					return;
+//				if (FlowGen.flowGenStatus)
+//					return;
 				long start_ts = System.nanoTime();
 				TrafficCollection trafficCollection = new TrafficCollection();
 				if (trafficCollection.getTopoMap().length != 0) {
