@@ -58,7 +58,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 //	public static final String OVERHEAD_4 = "/home/zhangziqi/Documents/scripts/overhead_4.txt";
 //	public static final String OVERHEAD_5 = "/home/zhangziqi/Documents/scripts/overhead_5.txt";
 //	public static final String OVERHEAD_6 = "/home/zhangziqi/Documents/scripts/overhead_6.txt";
-	protected static final int PERIOD = 10000;
+	protected static final int PERIOD = 5000;
 	protected static int ATTACK_RATE = 0;
 	protected static int REPEAT_COUNT_LIMIT = 1;
 	protected static int repeatCount = 0;
