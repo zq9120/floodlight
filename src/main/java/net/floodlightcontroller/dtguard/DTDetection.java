@@ -52,12 +52,12 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	protected static final String DTDETECTION_CONFIG_PATH = "/home/zhangziqi/Documents/scripts/dtdetection_config.txt";
 	protected static final String CONFIG_PATH = "/home/zhangziqi/Documents/scripts/config.txt";
 	protected static final String OUTDATA_PATH = "/home/zhangziqi/Documents/scripts/statistic.csv";
-	protected static final String OVERHEAD_1 = "/home/zhangziqi/Documents/scripts/overhead_1.txt";
-	protected static final String OVERHEAD_2 = "/home/zhangziqi/Documents/scripts/overhead_2.txt";
-	protected static final String OVERHEAD_3 = "/home/zhangziqi/Documents/scripts/overhead_3.txt";
-	public static final String OVERHEAD_4 = "/home/zhangziqi/Documents/scripts/overhead_4.txt";
-	public static final String OVERHEAD_5 = "/home/zhangziqi/Documents/scripts/overhead_5.txt";
-	public static final String OVERHEAD_6 = "/home/zhangziqi/Documents/scripts/overhead_6.txt";
+//	protected static final String OVERHEAD_1 = "/home/zhangziqi/Documents/scripts/overhead_1.txt";
+//	protected static final String OVERHEAD_2 = "/home/zhangziqi/Documents/scripts/overhead_2.txt";
+//	protected static final String OVERHEAD_3 = "/home/zhangziqi/Documents/scripts/overhead_3.txt";
+//	public static final String OVERHEAD_4 = "/home/zhangziqi/Documents/scripts/overhead_4.txt";
+//	public static final String OVERHEAD_5 = "/home/zhangziqi/Documents/scripts/overhead_5.txt";
+//	public static final String OVERHEAD_6 = "/home/zhangziqi/Documents/scripts/overhead_6.txt";
 	protected static final int PERIOD = 10000;
 	protected static int ATTACK_RATE = 0;
 	protected static int REPEAT_COUNT_LIMIT = 1;
@@ -67,19 +67,19 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	private final static int DETECTION_TYPE_ATTACK = 1;
 	private final static int DETECTION_TYPE_NORMAL = 0;
 
-	private FloodlightModuleContext context;
+//	private FloodlightModuleContext context;
 
 	@Override
 	public void init(FloodlightModuleContext context) throws FloodlightModuleException {
-		this.context = context;
+//		this.context = context;
 		// ATTACK 5 / ATTACK 60
 		// NORMAL 300 / NORMAL 3000
-		FileUtils.writeFile(OVERHEAD_1, "");
-		FileUtils.writeFile(OVERHEAD_2, "");
-		FileUtils.writeFile(OVERHEAD_3, "");
-		FileUtils.writeFile(OVERHEAD_4, "");
-		FileUtils.writeFile(OVERHEAD_5, "");
-		FileUtils.writeFile(OVERHEAD_6, "");
+//		FileUtils.writeFile(OVERHEAD_1, "");
+//		FileUtils.writeFile(OVERHEAD_2, "");
+//		FileUtils.writeFile(OVERHEAD_3, "");
+//		FileUtils.writeFile(OVERHEAD_4, "");
+//		FileUtils.writeFile(OVERHEAD_5, "");
+//		FileUtils.writeFile(OVERHEAD_6, "");
 		String dtDetectionConfig = FileUtils.readFile(DTDETECTION_CONFIG_PATH);
 		if (dtDetectionConfig == null)
 			dtDetectionConfig = "ATTACK 1";
@@ -102,8 +102,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 		Timer timer = new Timer();
 		timer.schedule(new StaticCalc(), PERIOD, PERIOD);
 
-		Timer timer2 = new Timer();
-		timer2.schedule(new DefenseTask(), PERIOD, PERIOD);
+//		Timer timer2 = new Timer();
+//		timer2.schedule(new DefenseTask(), PERIOD, PERIOD);
 	}
 
 	@Override
@@ -137,7 +137,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 	public Command receive(IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
 		switch (msg.getType()) {
 		case PACKET_IN:
-			long start_ts = System.nanoTime();
+//			long start_ts = System.nanoTime();
 			Ethernet eth = IFloodlightProviderService.bcStore.get(cntx, IFloodlightProviderService.CONTEXT_PI_PAYLOAD);
 			if (eth.getEtherType() != EthType.IPv4)
 				break;
@@ -174,8 +174,8 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 			dstListFull.add(dstIP);
 
 			packetInCount++;
-			long end_ts = System.nanoTime();
-			FileUtils.writeFile(OVERHEAD_1, FileUtils.readFile(OVERHEAD_1) + String.valueOf(end_ts - start_ts) + "\n");
+//			long end_ts = System.nanoTime();
+//			FileUtils.writeFile(OVERHEAD_1, FileUtils.readFile(OVERHEAD_1) + String.valueOf(end_ts - start_ts) + "\n");
 			break;
 		default:
 			break;
@@ -197,7 +197,7 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 
 		public void run() {
 			try {
-				long start_ts = System.nanoTime();
+//				long start_ts = System.nanoTime();
 				logger.info("======== StaticCalc ========");
 
 				ICHelper icSwList = new ICHelper(CONTROLLER_URL + "wm/core/controller/switches/json");
@@ -333,15 +333,15 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 					} else {
 						if (++repeatCount == REPEAT_COUNT_LIMIT) {
 							repeatCount = 0;
-							ATTACK_RATE += 1;
-							if (ATTACK_RATE > 60)
+							ATTACK_RATE += 10;
+							if (ATTACK_RATE > 35)
 								System.exit(0);
 						}
 					}
 				}
-				long end_ts = System.nanoTime();
-				FileUtils.writeFile(OVERHEAD_2,
-						FileUtils.readFile(OVERHEAD_2) + String.valueOf(end_ts - start_ts) + "\n");
+//				long end_ts = System.nanoTime();
+//				FileUtils.writeFile(OVERHEAD_2,
+//						FileUtils.readFile(OVERHEAD_2) + String.valueOf(end_ts - start_ts) + "\n");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -384,30 +384,30 @@ public class DTDetection implements IOFMessageListener, IFloodlightModule {
 			try {
 //				if (FlowGen.flowGenStatus)
 //					return;
-				long start_ts = System.nanoTime();
+//				long start_ts = System.nanoTime();
 				TrafficCollection trafficCollection = new TrafficCollection();
 				if (trafficCollection.getTopoMap().length != 0) {
-					long end_ts = System.nanoTime();
-					FileUtils.writeFile(OVERHEAD_3,
-							FileUtils.readFile(OVERHEAD_3) + String.valueOf(end_ts - start_ts) + "\n");
+//					long end_ts = System.nanoTime();
+//					FileUtils.writeFile(OVERHEAD_3,
+//							FileUtils.readFile(OVERHEAD_3) + String.valueOf(end_ts - start_ts) + "\n");
 
-					long start_ts1 = System.nanoTime();
+//					long start_ts1 = System.nanoTime();
 					RouteCalc routeCalc = new RouteCalc(trafficCollection.getTopoMap());
 					int[] route = routeCalc.getRoute();
-					long end_ts1 = System.nanoTime();
-					FileUtils.writeFile(OVERHEAD_4,
-							FileUtils.readFile(OVERHEAD_4) + String.valueOf(end_ts1 - start_ts1) + "\n");
+//					long end_ts1 = System.nanoTime();
+//					FileUtils.writeFile(OVERHEAD_4,
+//							FileUtils.readFile(OVERHEAD_4) + String.valueOf(end_ts1 - start_ts1) + "\n");
 
-					long start_ts2 = System.nanoTime();
+//					long start_ts2 = System.nanoTime();
 					String[] no2Dpid = trafficCollection.getNo2Dpid();
 					FlowGen flowGen = new FlowGen(route, no2Dpid);
 					flowGen.genCommonFlow();
 					flowGen.genFlow();
 					FlowGen.rootDpid = no2Dpid[0];
 					FlowGen.flowGenStatus = true;
-					long end_ts2 = System.nanoTime();
-					FileUtils.writeFile(OVERHEAD_5,
-							FileUtils.readFile(OVERHEAD_5) + String.valueOf(end_ts2 - start_ts2) + "\n");
+//					long end_ts2 = System.nanoTime();
+//					FileUtils.writeFile(OVERHEAD_5,
+//							FileUtils.readFile(OVERHEAD_5) + String.valueOf(end_ts2 - start_ts2) + "\n");
 
 				}
 
